@@ -115,57 +115,25 @@
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  let W, H, particles, stars, animId;
-
-  const PARTICLE_COUNT = 80;
-  const MAX_DIST       = 140;
-  const SPEED          = 0.35;
+  let W, H, stars, animId;
 
   // Shooting star constants（値の調整ポイント）
-  const STAR_COUNT           = 8;      // 同時表示数 → 増やすと賑やか
+  const STAR_COUNT           = 10;    // 同時表示数 → 増やすと賑やか
   const STAR_ANGLE           = 30 * (Math.PI / 180); // 流れる角度（deg）→ 30 = 右下方向
   const STAR_DX              = Math.cos(STAR_ANGLE);  // ≈  0.866
   const STAR_DY              = Math.sin(STAR_ANGLE);  // ≈  0.500
-  const STAR_SPEED_MIN       = 3.5;   // 最低速度（px/frame）→ 遅くすると優雅
-  const STAR_SPEED_MAX       = 7.5;   // 最高速度
-  const STAR_LENGTH_MIN      = 60;    // 最短の尾（px）
-  const STAR_LENGTH_MAX      = 160;   // 最長の尾
-  const STAR_ALPHA_MIN       = 0.30;  // 最低透明度（CSS opacity 0.6 でさらに減衰）
-  const STAR_ALPHA_MAX       = 0.65;  // 最高透明度
-  const STAR_WIDTH_MIN       = 0.8;   // 最細線幅（px）
-  const STAR_WIDTH_MAX       = 1.6;   // 最太線幅
+  const STAR_SPEED_MIN       = 6;     // 最低速度（px/frame）→ 遅くすると優雅
+  const STAR_SPEED_MAX       = 14;    // 最高速度
+  const STAR_LENGTH_MIN      = 80;    // 最短の尾（px）
+  const STAR_LENGTH_MAX      = 220;   // 最長の尾
+  const STAR_ALPHA_MIN       = 0.50;  // 最低透明度
+  const STAR_ALPHA_MAX       = 0.90;  // 最高透明度
+  const STAR_WIDTH_MIN       = 1.0;   // 最細線幅（px）
+  const STAR_WIDTH_MAX       = 2.2;   // 最太線幅
   const STAR_FADE_IN         = 8;     // フェードイン フレーム数（短いほど突然現れる）
-  const STAR_FADE_OUT        = 22;    // フェードアウト フレーム数（長いほどゆっくり消える）
-  const STAR_LIFE_ACTIVE_MIN = 20;    // 活動フレーム数（最小）
-  const STAR_LIFE_ACTIVE_MAX = 55;    // 活動フレーム数（最大）
-
-  class Particle {
-    constructor() { this.reset(true); }
-
-    reset(init = false) {
-      this.x  = Math.random() * W;
-      this.y  = init ? Math.random() * H : (Math.random() < 0.5 ? -5 : H + 5);
-      this.vx = (Math.random() - 0.5) * SPEED;
-      this.vy = (Math.random() - 0.5) * SPEED;
-      this.r  = Math.random() * 1.5 + 0.5;
-      this.alpha = Math.random() * 0.5 + 0.2;
-    }
-
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.x < -10 || this.x > W + 10 || this.y < -10 || this.y > H + 10) {
-        this.reset();
-      }
-    }
-
-    draw() {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(240, 112, 48, ${this.alpha})`;
-      ctx.fill();
-    }
-  }
+  const STAR_FADE_OUT        = 25;    // フェードアウト フレーム数（長いほどゆっくり消える）
+  const STAR_LIFE_ACTIVE_MIN = 30;    // 活動フレーム数（最小）
+  const STAR_LIFE_ACTIVE_MAX = 80;    // 活動フレーム数（最大）
 
   class ShootingStar {
     constructor() { this.reset(true); }
@@ -186,9 +154,9 @@
         this.y   = Math.random() * H;
         this.age = Math.random() * this.maxLife;
       } else {
-        // 再スポーン：左端 or 上端からランダムに入場（右下方向へ流れる）
+        // 再スポーン：左端(65%) or 上端(35%)から入場（右下方向へ流れる）
         this.age = 0;
-        if (Math.random() < 0.5) {
+        if (Math.random() < 0.65) {
           this.x = -this.length;
           this.y = Math.random() * H;
         } else {
@@ -243,39 +211,16 @@
     H = canvas.height = canvas.offsetHeight;
   }
 
-  function drawConnections() {
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx   = particles[i].x - particles[j].x;
-        const dy   = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < MAX_DIST) {
-          const alpha = (1 - dist / MAX_DIST) * 0.12;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(240, 112, 48, ${alpha})`;
-          ctx.lineWidth   = 0.6;
-          ctx.stroke();
-        }
-      }
-    }
-  }
-
   function loop() {
     ctx.clearRect(0, 0, W, H);
-    stars.forEach(s => { s.update(); s.draw(); }); // 流れ星（背面）
-    particles.forEach(p => { p.update(); p.draw(); });
-    drawConnections();
+    stars.forEach(s => { s.update(); s.draw(); });
     animId = requestAnimationFrame(loop);
   }
 
   function init() {
     cancelAnimationFrame(animId);
     resize();
-    particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle());
-    stars     = Array.from({ length: STAR_COUNT },     () => new ShootingStar());
+    stars = Array.from({ length: STAR_COUNT }, () => new ShootingStar());
     loop();
   }
 

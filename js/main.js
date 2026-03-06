@@ -289,6 +289,55 @@
 
 
 /* ============================================================
+   流れ星アニメーション
+   ============================================================ */
+(function initShootingStars() {
+  const container = document.createElement('div');
+  container.id = 'shooting-stars-container';
+  document.body.prepend(container);
+
+  function spawnStar() {
+    const star = document.createElement('div');
+    star.className = 'shooting-star';
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // 画面上端〜左端のいずれかからスタート
+    const startX = Math.random() * vw * 1.2 - vw * 0.1;
+    const startY = Math.random() * vh * 0.6 - vh * 0.1;
+    const angle = 20 + Math.random() * 20; // 20〜40度の傾き
+    const rad = (angle * Math.PI) / 180;
+    const distance = 300 + Math.random() * 400;
+    const travelX = Math.cos(rad) * distance;
+    const travelY = Math.sin(rad) * distance;
+    const duration = 0.8 + Math.random() * 0.8;
+
+    star.style.setProperty('--start-x', `${startX}px`);
+    star.style.setProperty('--start-y', `${startY}px`);
+    star.style.setProperty('--travel-x', `${travelX}px`);
+    star.style.setProperty('--travel-y', `${travelY}px`);
+    star.style.setProperty('--angle', `${angle}deg`);
+    star.style.setProperty('--duration', `${duration}s`);
+    star.style.setProperty('--delay', '0s');
+
+    container.appendChild(star);
+    setTimeout(() => star.remove(), duration * 1000 + 100);
+  }
+
+  // 最初の数秒は少し間隔を空けて流れ星を生成し、その後定期的に
+  let count = 0;
+  function schedule() {
+    spawnStar();
+    count++;
+    const next = count < 5 ? 600 + Math.random() * 800 : 1800 + Math.random() * 3000;
+    setTimeout(schedule, next);
+  }
+  setTimeout(schedule, 1000);
+})();
+
+
+/* ============================================================
    Utility: デバウンス
    ============================================================ */
 function debounce(fn, delay) {

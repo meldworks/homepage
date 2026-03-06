@@ -161,3 +161,44 @@
 body {
   animation: pageLoad 0.4s ease forwards;
 }
+
+/* ──────────────────────────────────────────────
+   流れ星
+   ────────────────────────────────────────────── */
+#shooting-stars-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.shooting-star {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 60%, rgba(240,112,48,0.6) 100%);
+  border-radius: 1px;
+  opacity: 0;
+  animation: shootingStar var(--duration, 1.2s) var(--delay, 0s) linear forwards;
+  transform-origin: left center;
+}
+
+@keyframes shootingStar {
+  0% {
+    opacity: 0;
+    transform: translate(var(--start-x), var(--start-y)) rotate(var(--angle)) scaleX(0);
+  }
+  5% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--start-x) + var(--travel-x)), calc(var(--start-y) + var(--travel-y))) rotate(var(--angle)) scaleX(1);
+  }
+}

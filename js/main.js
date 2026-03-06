@@ -154,15 +154,10 @@
         this.y   = Math.random() * H;
         this.age = Math.random() * this.maxLife;
       } else {
-        // 再スポーン：左端(65%) or 上端(35%)から入場（右下方向へ流れる）
+        // 再スポーン：画面内の左上エリアにランダム出現（低速でも常に見える状態を保つ）
         this.age = 0;
-        if (Math.random() < 0.65) {
-          this.x = -this.length;
-          this.y = Math.random() * H;
-        } else {
-          this.x = Math.random() * W;
-          this.y = -this.length;
-        }
+        this.x = Math.random() * W * 0.7;
+        this.y = Math.random() * H * 0.6;
       }
     }
 

@@ -122,18 +122,22 @@
   const SPEED          = 0.35;
 
   // Shooting star constants（値の調整ポイント）
-  const STAR_COUNT      = 8;      // 同時表示数 → 増やすと賑やか
-  const STAR_ANGLE      = 210 * (Math.PI / 180); // 流れる角度（deg）→ 210 = 左下方向
-  const STAR_DX         = Math.cos(STAR_ANGLE);  // ≈ -0.866
-  const STAR_DY         = Math.sin(STAR_ANGLE);  // ≈  0.500
-  const STAR_SPEED_MIN  = 3.5;   // 最低速度（px/frame）→ 遅くすると優雅
-  const STAR_SPEED_MAX  = 7.5;   // 最高速度
-  const STAR_LENGTH_MIN = 60;    // 最短の尾（px）
-  const STAR_LENGTH_MAX = 160;   // 最長の尾
-  const STAR_ALPHA_MIN  = 0.30;  // 最低透明度（CSS opacity 0.6 でさらに減衰）
-  const STAR_ALPHA_MAX  = 0.65;  // 最高透明度
-  const STAR_WIDTH_MIN  = 0.8;   // 最細線幅（px）
-  const STAR_WIDTH_MAX  = 1.6;   // 最太線幅
+  const STAR_COUNT           = 8;      // 同時表示数 → 増やすと賑やか
+  const STAR_ANGLE           = 30 * (Math.PI / 180); // 流れる角度（deg）→ 30 = 右下方向
+  const STAR_DX              = Math.cos(STAR_ANGLE);  // ≈  0.866
+  const STAR_DY              = Math.sin(STAR_ANGLE);  // ≈  0.500
+  const STAR_SPEED_MIN       = 3.5;   // 最低速度（px/frame）→ 遅くすると優雅
+  const STAR_SPEED_MAX       = 7.5;   // 最高速度
+  const STAR_LENGTH_MIN      = 60;    // 最短の尾（px）
+  const STAR_LENGTH_MAX      = 160;   // 最長の尾
+  const STAR_ALPHA_MIN       = 0.30;  // 最低透明度（CSS opacity 0.6 でさらに減衰）
+  const STAR_ALPHA_MAX       = 0.65;  // 最高透明度
+  const STAR_WIDTH_MIN       = 0.8;   // 最細線幅（px）
+  const STAR_WIDTH_MAX       = 1.6;   // 最太線幅
+  const STAR_FADE_IN         = 8;     // フェードイン フレーム数（短いほど突然現れる）
+  const STAR_FADE_OUT        = 22;    // フェードアウト フレーム数（長いほどゆっくり消える）
+  const STAR_LIFE_ACTIVE_MIN = 20;    // 活動フレーム数（最小）
+  const STAR_LIFE_ACTIVE_MAX = 55;    // 活動フレーム数（最大）
 
   class Particle {
     constructor() { this.reset(true); }
@@ -167,25 +171,29 @@
     constructor() { this.reset(true); }
 
     reset(init = false) {
-      this.speed  = STAR_SPEED_MIN + Math.random() * (STAR_SPEED_MAX - STAR_SPEED_MIN);
-      this.length = STAR_LENGTH_MIN + Math.random() * (STAR_LENGTH_MAX - STAR_LENGTH_MIN);
-      this.alpha  = STAR_ALPHA_MIN + Math.random() * (STAR_ALPHA_MAX - STAR_ALPHA_MIN);
-      this.width  = STAR_WIDTH_MIN + Math.random() * (STAR_WIDTH_MAX - STAR_WIDTH_MIN);
-      this.vx     = STAR_DX * this.speed;
-      this.vy     = STAR_DY * this.speed;
+      this.speed   = STAR_SPEED_MIN + Math.random() * (STAR_SPEED_MAX - STAR_SPEED_MIN);
+      this.length  = STAR_LENGTH_MIN + Math.random() * (STAR_LENGTH_MAX - STAR_LENGTH_MIN);
+      this.alpha   = STAR_ALPHA_MIN + Math.random() * (STAR_ALPHA_MAX - STAR_ALPHA_MIN);
+      this.width   = STAR_WIDTH_MIN + Math.random() * (STAR_WIDTH_MAX - STAR_WIDTH_MIN);
+      this.vx      = STAR_DX * this.speed;
+      this.vy      = STAR_DY * this.speed;
+      const active = STAR_LIFE_ACTIVE_MIN + Math.random() * (STAR_LIFE_ACTIVE_MAX - STAR_LIFE_ACTIVE_MIN);
+      this.maxLife = STAR_FADE_IN + active + STAR_FADE_OUT;
 
       if (init) {
-        // 初期ロード時：画面全体にばらまいて即座に見える状態にする
-        this.x = Math.random() * W;
-        this.y = Math.random() * H;
+        // 初期ロード時：ライフサイクルをランダムにずらして自然に見せる
+        this.x   = Math.random() * W;
+        this.y   = Math.random() * H;
+        this.age = Math.random() * this.maxLife;
       } else {
-        // 再スポーン：画面外の上端 or 右端からランダムに入場
+        // 再スポーン：左端 or 上端からランダムに入場（右下方向へ流れる）
+        this.age = 0;
         if (Math.random() < 0.5) {
-          this.x = Math.random() * (W + this.length);
-          this.y = -this.length;
+          this.x = -this.length;
+          this.y = Math.random() * H;
         } else {
-          this.x = W + this.length;
-          this.y = Math.random() * (H + this.length);
+          this.x = Math.random() * W;
+          this.y = -this.length;
         }
       }
     }
@@ -193,18 +201,32 @@
     update() {
       this.x += this.vx;
       this.y += this.vy;
-      if (this.x < -this.length || this.y > H + this.length) {
-        this.reset(); // 画面外に出たら再スポーン → 常に流れ続ける
+      this.age++;
+      // ライフサイクル終了 or 画面外に出たらリセット
+      if (this.age >= this.maxLife || this.x > W + this.length || this.y > H + this.length) {
+        this.reset();
       }
     }
 
     draw() {
+      // フェードイン・持続・フェードアウトのライフサイクルで透明度を制御
+      let t;
+      if (this.age < STAR_FADE_IN) {
+        t = this.age / STAR_FADE_IN;                            // 素早く現れる
+      } else if (this.age < this.maxLife - STAR_FADE_OUT) {
+        t = 1.0;                                                 // 持続
+      } else {
+        t = (this.maxLife - this.age) / STAR_FADE_OUT;          // ゆっくり消える
+      }
+      const effectiveAlpha = this.alpha * Math.max(0, t);
+      if (effectiveAlpha <= 0.01) return;
+
       const tx = this.x - STAR_DX * this.length; // 尾の先端 x
       const ty = this.y - STAR_DY * this.length; // 尾の先端 y
 
       const grad = ctx.createLinearGradient(tx, ty, this.x, this.y);
-      grad.addColorStop(0, `rgba(255, 240, 220, 0)`);
-      grad.addColorStop(1, `rgba(255, 240, 220, ${this.alpha})`);
+      grad.addColorStop(0, `rgba(255, 255, 255, 0)`);
+      grad.addColorStop(1, `rgba(255, 255, 255, ${effectiveAlpha})`);
 
       ctx.beginPath();
       ctx.moveTo(tx, ty);

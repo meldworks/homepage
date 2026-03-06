@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 490" fill="none" aria-label="meldworks logo">
+  <!-- Circle outline -->
+  <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="2.8"/>
+
+  <!-- Small dot (upper-left inside circle) -->
+  <circle cx="162" cy="170" r="7.5" fill="currentColor"/>
+
+  <!-- Large dot (lower-left inside circle) -->
+  <circle cx="143" cy="285" r="21" fill="currentColor"/>
+
+  <!-- Short diagonal line (inside, upper portion) -->
+  <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- Long diagonal line, upper (crosses circle boundary to the right) -->
+  <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- Long diagonal line, lower (crosses circle boundary to the right) -->
+  <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+</svg>

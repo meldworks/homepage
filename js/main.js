@@ -325,15 +325,17 @@
     setTimeout(() => star.remove(), duration * 1000 + 100);
   }
 
-  // 最初の数秒は少し間隔を空けて流れ星を生成し、その後定期的に
-  let count = 0;
-  function schedule() {
-    spawnStar();
-    count++;
-    const next = count < 5 ? 600 + Math.random() * 800 : 1800 + Math.random() * 3000;
-    setTimeout(schedule, next);
+  // 独立したスケジューラーを3本走らせることで複数の星が同時に流れる
+  function startLoop(initialDelay, baseInterval, jitter) {
+    setTimeout(function tick() {
+      spawnStar();
+      setTimeout(tick, baseInterval + Math.random() * jitter);
+    }, initialDelay);
   }
-  setTimeout(schedule, 1000);
+
+  startLoop(800,  1200, 1600);
+  startLoop(2000, 1400, 1800);
+  startLoop(3500, 1600, 2000);
 })();
 
 

@@ -108,102 +108,8 @@
 
 
 /* ============================================================
-   5. ヒーロー Canvas：パーティクル & ニューロンネットワーク
+   5. ヒーロー Canvas（グローバル流れ星Canvasに統合済み）
    ============================================================ */
-(function initHeroCanvas() {
-  const canvas = document.getElementById('hero-canvas');
-  if (!canvas) return;
-
-  const ctx = canvas.getContext('2d');
-  let W, H, stars, animId;
-
-  const STAR_COUNT = 5; // 同時表示数
-
-  class ShootingStar {
-    constructor() { this.reset(true); }
-
-    reset(init = false) {
-      // 各星ごとに完全にランダムな個性を持たせる
-      this.speed   = 0.4 + Math.random() * 3.5;              // 0.4〜3.9 px/f（遅い星〜速い星）
-      this.length  = 30 + Math.random() * 180;               // 30〜210 px（短い尾〜長い尾）
-      this.alpha   = 0.30 + Math.random() * 0.55;            // 0.30〜0.85（薄い〜濃い）
-      this.width   = 0.4 + Math.random() * 1.8;              // 0.4〜2.2 px（細い〜太い）
-      this.fadeIn  = 4 + Math.random() * 20;                 // 4〜24 f（ぱっと現れる〜ゆっくり現れる）
-      this.fadeOut = 15 + Math.random() * 60;                // 15〜75 f（さっと消える〜ゆっくり消える）
-      const active = 30 + Math.random() * 200;               // 30〜230 f（短命〜長命）
-      this.maxLife = this.fadeIn + active + this.fadeOut;
-
-      // 角度もわずかにばらつかせて自然な群れ感を出す（25°〜40°）
-      const angle = (25 + Math.random() * 15) * (Math.PI / 180);
-      this.vx = Math.cos(angle) * this.speed;
-      this.vy = Math.sin(angle) * this.speed;
-
-      this.x = Math.random() * W;
-      this.y = Math.random() * H;
-      this.age = init ? Math.random() * this.maxLife : 0;
-    }
-
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      this.age++;
-      if (this.age >= this.maxLife || this.x > W + this.length || this.y > H + this.length) {
-        this.reset();
-      }
-    }
-
-    draw() {
-      let t;
-      if (this.age < this.fadeIn) {
-        t = this.age / this.fadeIn;
-      } else if (this.age < this.maxLife - this.fadeOut) {
-        t = 1.0;
-      } else {
-        t = (this.maxLife - this.age) / this.fadeOut;
-      }
-      const effectiveAlpha = this.alpha * Math.max(0, t);
-      if (effectiveAlpha <= 0.01) return;
-
-      // 尾の方向は各星の実際の速度ベクトルに基づく
-      const len = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-      const tx = this.x - (this.vx / len) * this.length;
-      const ty = this.y - (this.vy / len) * this.length;
-
-      const grad = ctx.createLinearGradient(tx, ty, this.x, this.y);
-      grad.addColorStop(0, `rgba(255, 255, 255, 0)`);
-      grad.addColorStop(1, `rgba(255, 255, 255, ${effectiveAlpha})`);
-
-      ctx.beginPath();
-      ctx.moveTo(tx, ty);
-      ctx.lineTo(this.x, this.y);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth   = this.width;
-      ctx.lineCap     = 'round';
-      ctx.stroke();
-    }
-  }
-
-  function resize() {
-    W = canvas.width  = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
-  }
-
-  function loop() {
-    ctx.clearRect(0, 0, W, H);
-    stars.forEach(s => { s.update(); s.draw(); });
-    animId = requestAnimationFrame(loop);
-  }
-
-  function init() {
-    cancelAnimationFrame(animId);
-    resize();
-    stars = Array.from({ length: STAR_COUNT }, () => new ShootingStar());
-    loop();
-  }
-
-  window.addEventListener('resize', debounce(init, 200));
-  init();
-})();
 
 
 /* ============================================================
@@ -289,53 +195,99 @@
 
 
 /* ============================================================
-   流れ星アニメーション
+   流れ星 Canvas（全ページ共通・fixed背景）
    ============================================================ */
-(function initShootingStars() {
-  const container = document.createElement('div');
-  container.id = 'shooting-stars-container';
-  document.body.prepend(container);
+(function initGlobalShootingStars() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'global-star-canvas';
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:999;';
+  document.body.prepend(canvas);
 
-  function spawnStar() {
-    const star = document.createElement('div');
-    star.className = 'shooting-star';
+  const ctx = canvas.getContext('2d');
+  let W, H, stars;
 
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+  const STAR_COUNT = 5;
 
-    // 画面上端〜左端のいずれかからスタート
-    const startX = Math.random() * vw * 1.2 - vw * 0.1;
-    const startY = Math.random() * vh * 0.6 - vh * 0.1;
-    const angle = 20 + Math.random() * 20; // 20〜40度の傾き
-    const rad = (angle * Math.PI) / 180;
-    const distance = 300 + Math.random() * 400;
-    const travelX = Math.cos(rad) * distance;
-    const travelY = Math.sin(rad) * distance;
-    const duration = 0.8 + Math.random() * 0.8;
+  class ShootingStar {
+    constructor() { this.reset(true); }
 
-    star.style.setProperty('--start-x', `${startX}px`);
-    star.style.setProperty('--start-y', `${startY}px`);
-    star.style.setProperty('--travel-x', `${travelX}px`);
-    star.style.setProperty('--travel-y', `${travelY}px`);
-    star.style.setProperty('--angle', `${angle}deg`);
-    star.style.setProperty('--duration', `${duration}s`);
-    star.style.setProperty('--delay', '0s');
+    reset(init = false) {
+      this.speed   = 0.4 + Math.random() * 3.5;
+      this.length  = 30  + Math.random() * 180;
+      this.alpha   = 0.30 + Math.random() * 0.55;
+      this.width   = 0.4 + Math.random() * 1.8;
+      this.fadeIn  = 4   + Math.random() * 20;
+      this.fadeOut = 15  + Math.random() * 60;
+      const active = 30  + Math.random() * 200;
+      this.maxLife = this.fadeIn + active + this.fadeOut;
 
-    container.appendChild(star);
-    setTimeout(() => star.remove(), duration * 1000 + 100);
+      const angle = (25 + Math.random() * 15) * (Math.PI / 180);
+      this.vx = Math.cos(angle) * this.speed;
+      this.vy = Math.sin(angle) * this.speed;
+
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.age = init ? Math.random() * this.maxLife : 0;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.age++;
+      if (this.age >= this.maxLife || this.x > W + this.length || this.y > H + this.length) {
+        this.reset();
+      }
+    }
+
+    draw() {
+      let t;
+      if (this.age < this.fadeIn) {
+        t = this.age / this.fadeIn;
+      } else if (this.age < this.maxLife - this.fadeOut) {
+        t = 1.0;
+      } else {
+        t = (this.maxLife - this.age) / this.fadeOut;
+      }
+      const a = this.alpha * Math.max(0, t);
+      if (a <= 0.01) return;
+
+      const len = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+      const tx = this.x - (this.vx / len) * this.length;
+      const ty = this.y - (this.vy / len) * this.length;
+
+      const grad = ctx.createLinearGradient(tx, ty, this.x, this.y);
+      grad.addColorStop(0, `rgba(255,255,255,0)`);
+      grad.addColorStop(1, `rgba(255,255,255,${a})`);
+
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(this.x, this.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = this.width;
+      ctx.lineCap     = 'round';
+      ctx.stroke();
+    }
   }
 
-  // 独立したスケジューラーを3本走らせることで複数の星が同時に流れる
-  function startLoop(initialDelay, baseInterval, jitter) {
-    setTimeout(function tick() {
-      spawnStar();
-      setTimeout(tick, baseInterval + Math.random() * jitter);
-    }, initialDelay);
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
   }
 
-  startLoop(800,  1200, 1600);
-  startLoop(2000, 1400, 1800);
-  startLoop(3500, 1600, 2000);
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    stars.forEach(s => { s.update(); s.draw(); });
+    requestAnimationFrame(loop);
+  }
+
+  function init() {
+    resize();
+    stars = Array.from({ length: STAR_COUNT }, () => new ShootingStar());
+    loop();
+  }
+
+  window.addEventListener('resize', debounce(init, 200));
+  init();
 })();
 
 

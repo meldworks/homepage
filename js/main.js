@@ -117,7 +117,7 @@
   const ctx = canvas.getContext('2d');
   let W, H, stars, animId;
 
-  const STAR_COUNT = 7; // 同時表示数
+  const STAR_COUNT = 5; // 同時表示数
 
   class ShootingStar {
     constructor() { this.reset(true); }

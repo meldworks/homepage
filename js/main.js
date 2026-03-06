@@ -115,11 +115,25 @@
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  let W, H, particles, animId;
+  let W, H, particles, stars, animId;
 
   const PARTICLE_COUNT = 80;
   const MAX_DIST       = 140;
   const SPEED          = 0.35;
+
+  // Shooting star constants（値の調整ポイント）
+  const STAR_COUNT      = 8;      // 同時表示数 → 増やすと賑やか
+  const STAR_ANGLE      = 210 * (Math.PI / 180); // 流れる角度（deg）→ 210 = 左下方向
+  const STAR_DX         = Math.cos(STAR_ANGLE);  // ≈ -0.866
+  const STAR_DY         = Math.sin(STAR_ANGLE);  // ≈  0.500
+  const STAR_SPEED_MIN  = 3.5;   // 最低速度（px/frame）→ 遅くすると優雅
+  const STAR_SPEED_MAX  = 7.5;   // 最高速度
+  const STAR_LENGTH_MIN = 60;    // 最短の尾（px）
+  const STAR_LENGTH_MAX = 160;   // 最長の尾
+  const STAR_ALPHA_MIN  = 0.30;  // 最低透明度（CSS opacity 0.6 でさらに減衰）
+  const STAR_ALPHA_MAX  = 0.65;  // 最高透明度
+  const STAR_WIDTH_MIN  = 0.8;   // 最細線幅（px）
+  const STAR_WIDTH_MAX  = 1.6;   // 最太線幅
 
   class Particle {
     constructor() { this.reset(true); }
@@ -146,6 +160,59 @@
       ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(240, 112, 48, ${this.alpha})`;
       ctx.fill();
+    }
+  }
+
+  class ShootingStar {
+    constructor() { this.reset(true); }
+
+    reset(init = false) {
+      this.speed  = STAR_SPEED_MIN + Math.random() * (STAR_SPEED_MAX - STAR_SPEED_MIN);
+      this.length = STAR_LENGTH_MIN + Math.random() * (STAR_LENGTH_MAX - STAR_LENGTH_MIN);
+      this.alpha  = STAR_ALPHA_MIN + Math.random() * (STAR_ALPHA_MAX - STAR_ALPHA_MIN);
+      this.width  = STAR_WIDTH_MIN + Math.random() * (STAR_WIDTH_MAX - STAR_WIDTH_MIN);
+      this.vx     = STAR_DX * this.speed;
+      this.vy     = STAR_DY * this.speed;
+
+      if (init) {
+        // 初期ロード時：画面全体にばらまいて即座に見える状態にする
+        this.x = Math.random() * W;
+        this.y = Math.random() * H;
+      } else {
+        // 再スポーン：画面外の上端 or 右端からランダムに入場
+        if (Math.random() < 0.5) {
+          this.x = Math.random() * (W + this.length);
+          this.y = -this.length;
+        } else {
+          this.x = W + this.length;
+          this.y = Math.random() * (H + this.length);
+        }
+      }
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < -this.length || this.y > H + this.length) {
+        this.reset(); // 画面外に出たら再スポーン → 常に流れ続ける
+      }
+    }
+
+    draw() {
+      const tx = this.x - STAR_DX * this.length; // 尾の先端 x
+      const ty = this.y - STAR_DY * this.length; // 尾の先端 y
+
+      const grad = ctx.createLinearGradient(tx, ty, this.x, this.y);
+      grad.addColorStop(0, `rgba(255, 240, 220, 0)`);
+      grad.addColorStop(1, `rgba(255, 240, 220, ${this.alpha})`);
+
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(this.x, this.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = this.width;
+      ctx.lineCap     = 'round';
+      ctx.stroke();
     }
   }
 
@@ -176,6 +243,7 @@
 
   function loop() {
     ctx.clearRect(0, 0, W, H);
+    stars.forEach(s => { s.update(); s.draw(); }); // 流れ星（背面）
     particles.forEach(p => { p.update(); p.draw(); });
     drawConnections();
     animId = requestAnimationFrame(loop);
@@ -185,6 +253,7 @@
     cancelAnimationFrame(animId);
     resize();
     particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle());
+    stars     = Array.from({ length: STAR_COUNT },     () => new ShootingStar());
     loop();
   }
 

@@ -242,10 +242,10 @@ button {
 
 .logo-img {
   width: 28px;
-  height: auto;
-  color: var(--color-white);
-  filter: invert(1);
+  height: 28px;
+  object-fit: contain;
   flex-shrink: 0;
+  display: block;
 }
 
 .logo-text {
@@ -261,6 +261,7 @@ button {
   font-size: 0.65rem;
   color: var(--color-text-muted);
   letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 
 .nav-links {
@@ -1003,9 +1004,10 @@ button {
 
 .footer-logo-img {
   width: 36px;
-  height: auto;
-  filter: invert(1);
+  height: 36px;
+  object-fit: contain;
   flex-shrink: 0;
+  display: block;
 }
 
 .footer-tagline {

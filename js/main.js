@@ -122,12 +122,12 @@
   const STAR_ANGLE           = 30 * (Math.PI / 180); // 流れる角度（deg）→ 30 = 右下方向
   const STAR_DX              = Math.cos(STAR_ANGLE);  // ≈  0.866
   const STAR_DY              = Math.sin(STAR_ANGLE);  // ≈  0.500
-  const STAR_SPEED_MIN       = 6;     // 最低速度（px/frame）→ 遅くすると優雅
-  const STAR_SPEED_MAX       = 14;    // 最高速度
+  const STAR_SPEED_MIN       = 3;     // 最低速度（px/frame）→ 遅くすると優雅
+  const STAR_SPEED_MAX       = 7;     // 最高速度
   const STAR_LENGTH_MIN      = 60;    // 最短の尾（px）
   const STAR_LENGTH_MAX      = 160;   // 最長の尾
-  const STAR_ALPHA_MIN       = 0.25;  // 最低透明度
-  const STAR_ALPHA_MAX       = 0.50;  // 最高透明度
+  const STAR_ALPHA_MIN       = 0.18;  // 最低透明度
+  const STAR_ALPHA_MAX       = 0.38;  // 最高透明度
   const STAR_WIDTH_MIN       = 0.7;   // 最細線幅（px）
   const STAR_WIDTH_MAX       = 1.4;   // 最太線幅
   const STAR_FADE_IN         = 8;     // フェードイン フレーム数（短いほど突然現れる）

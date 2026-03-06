@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HUSH — メルドワークスのウェアラブル脳波計。耳の後ろに装着するだけで、日常の中で脳波を計測できます。">
+  <title>Product — HUSH | meldworks Inc.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    /* Product ページ固有スタイル */
+    .product-hero-section {
+      padding: 80px 0 100px;
+      background: var(--color-bg-alt);
+    }
+    .product-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 8vw, 100px);
+      align-items: center;
+    }
+    .hush-name {
+      font-family: var(--font-en);
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 300;
+      color: var(--color-white);
+      letter-spacing: 0.15em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .hush-tagline {
+      font-size: 1rem;
+      color: var(--color-text-muted);
+      margin-bottom: 32px;
+    }
+    .hush-desc {
+      color: var(--color-text-muted);
+      line-height: 2;
+      margin-bottom: 40px;
+    }
+
+    /* spec table */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .spec-table th,
+    .spec-table td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.88rem;
+    }
+    .spec-table th {
+      width: 180px;
+      color: var(--color-text-muted);
+      font-weight: 400;
+      white-space: nowrap;
+    }
+    .spec-table td { color: var(--color-text); }
+    .spec-table tr:last-child th,
+    .spec-table tr:last-child td { border-bottom: none; }
+
+    /* Feature cards */
+    .feature-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--gap-grid);
+      margin-top: 60px;
+    }
+    .feature-card {
+      padding: 32px 28px;
+      border: 1px solid var(--color-border);
+      transition: border-color var(--dur-mid), background var(--dur-mid);
+    }
+    .feature-card:hover {
+      border-color: var(--color-border-hov);
+      background: var(--color-bg-card);
+    }
+    .feature-card-num {
+      font-family: var(--font-en);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--color-accent);
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--color-white);
+      margin-bottom: 12px;
+    }
+    .feature-card p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.8;
+    }
+
+    /* Product visual (product page) */
+    .product-visual-lg {
+      aspect-ratio: 1;
+      border: 1px solid rgba(240, 112, 48, 0.2);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0e0b08 0%, #090909 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .product-visual-lg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 40% 40%, rgba(240, 112, 48, 0.12) 0%, transparent 60%);
+    }
+    .product-visual-lg-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .product-visual-lg-inner .device-label-lg {
+      font-family: var(--font-en);
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: 0.3em;
+      color: var(--color-accent);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .product-visual-lg-inner .device-sub-lg {
+      font-family: var(--font-en);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--color-text-faint);
+      display: block;
+    }
+
+    @media (max-width: 900px) {
+      .product-hero-grid { grid-template-columns: 1fr; }
+      .feature-cards { grid-template-columns: 1fr; }
+      .spec-table th { width: 130px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header id="site-header" class="site-header scrolled">
+    <nav class="nav-container">
+      <a href="../index.html" class="nav-logo">
+        <span class="logo-text">meldworks</span>
+        <span class="logo-tag">Inc.</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="technology.html">Technology</a></li>
+        <li><a href="product.html" style="color: var(--color-accent);">Product</a></li>
+        <li><a href="../index.html#use-cases">Use Cases</a></li>
+        <li><a href="contact.html" class="nav-cta">Contact</a></li>
+      </ul>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <div class="nav-mobile" id="nav-mobile">
+      <ul>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="technology.html">Technology</a></li>
+        <li><a href="product.html">Product</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+      <div class="container">
+        <span class="section-label">PRODUCT</span>
+        <h1>HUSH</h1>
+        <p style="color: var(--color-text-muted); margin-top: 12px;">Wearable EEG Device</p>
+      </div>
+    </section>
+
+    <!-- PRODUCT HERO -->
+    <section class="product-hero-section">
+      <div class="container">
+        <div class="product-hero-grid">
+          <div class="product-visual-lg reveal">
+            <div class="product-visual-lg-inner">
+              <span class="device-label-lg">HUSH</span>
+              <span class="device-sub-lg">by meldworks Inc.</span>
+            </div>
+          </div>
+          <div class="reveal delay-1">
+            <span class="section-label">WEARABLE EEG</span>
+            <h2 class="hush-name">HUSH</h2>
+            <p class="hush-tagline">ウェアラブル脳波計</p>
+            <p class="hush-desc">
+              HUSHは、耳の後ろに装着するだけで脳波を計測できる、世界最小クラスのウェアラブルEEGデバイスです。
+              日常生活の中で、あなたの内的状態を静かに、継続的に観測します。
+            </p>
+            <ul class="product-features" style="margin-bottom: 40px;">
+              <li><span class="feature-dot"></span><span>耳の後ろへの超小型装着設計</span></li>
+              <li><span class="feature-dot"></span><span>ワイヤレスによる快適な装着感</span></li>
+              <li><span class="feature-dot"></span><span>リアルタイム脳波計測</span></li>
+              <li><span class="feature-dot"></span><span>アプリ・解析ソフトとの連携構想</span></li>
+              <li><span class="feature-dot"></span><span>日常装着を前提とした設計思想</span></li>
+            </ul>
+            <a href="contact.html" class="btn-primary">お問い合わせ・詳細資料を請求する</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section style="padding: 80px 0;">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-label">FEATURES</span>
+          <h2 class="section-title">HUSHの特長</h2>
+        </div>
+        <div class="feature-cards">
+          <div class="feature-card reveal">
+            <p class="feature-card-num">FEATURE 01</p>
+            <h3>超小型・耳後ろ装着</h3>
+            <p>これまでの脳波計は頭部全体に複数の電極を取り付ける必要がありました。HUSHは耳の後ろという一点に集約した超小型設計で、日常装着を実現します。</p>
+          </div>
+          <div class="feature-card reveal delay-1">
+            <p class="feature-card-num">FEATURE 02</p>
+            <h3>ワイヤレス・コードレス</h3>
+            <p>有線のコードは日常使用の大きな障壁です。HUSHはワイヤレス設計により、動きを制限することなく自由な日常の中での計測を可能にします。</p>
+          </div>
+          <div class="feature-card reveal delay-2">
+            <p class="feature-card-num">FEATURE 03</p>
+            <h3>リアルタイム計測</h3>
+            <p>脳波データはリアルタイムで処理・転送されます。集中・リラックス・覚醒度といった状態変化を、その瞬間に把握することができます。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPEC TABLE -->
+    <section style="padding: 80px 0; background: var(--color-bg-alt);">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-label">SPECIFICATIONS</span>
+          <h2 class="section-title">製品仕様（予定）</h2>
+        </div>
+        <div class="company-table-wrap reveal">
+          <table class="spec-table">
+            <tbody>
+              <tr>
+                <th>製品名</th>
+                <td>HUSH（ウェアラブル脳波計）</td>
+              </tr>
+              <tr>
+                <th>装着部位</th>
+                <td>耳の後ろ（耳介後部）</td>
+              </tr>
+              <tr>
+                <th>計測方式</th>
+                <td>脳波（EEG）計測</td>
+              </tr>
+              <tr>
+                <th>通信方式</th>
+                <td>ワイヤレス（Bluetooth）</td>
+              </tr>
+              <tr>
+                <th>データ処理</th>
+                <td>リアルタイム解析対応</td>
+              </tr>
+              <tr>
+                <th>連携</th>
+                <td>スマートフォンアプリ・解析ソフト（開発中）</td>
+              </tr>
+              <tr>
+                <th>ステータス</th>
+                <td>開発中</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="color: var(--color-text-faint); font-size: 0.8rem; margin-top: 20px;">
+          ※ 仕様は開発中のため変更となる場合があります。最新情報はお問い合わせください。
+        </p>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section style="padding: 120px 0;">
+      <div class="container">
+        <div class="contact-cta-inner reveal">
+          <span class="section-label">INQUIRY</span>
+          <h2 class="contact-cta-headline">HUSHについて、もっと知りたい方へ</h2>
+          <p class="contact-cta-body">製品の詳細資料・導入のご相談・プレスリリースなど、お気軽にご連絡ください。</p>
+          <a href="contact.html" class="btn-primary btn-large">お問い合わせ</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="site-footer" class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <p class="footer-logo">meldworks</p>
+          <p class="footer-tagline">脳波を、日常へ。</p>
+        </div>
+        <nav class="footer-nav">
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="product.html">Product</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2024 meldworks Inc. All rights reserved.</p>
+        <p class="footer-address">東京都</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="株式会社メルドワークスは、耳の後ろに装着するウェアラブル脳波計HUSHを開発するスタートアップです。脳波を日常のデータに変え、人が自分の状態をより深く理解できる社会を目指しています。">
+  <meta name="keywords" content="脳波計,ウェアラブル,EEG,HUSH,メルドワークス,meldworks,BCI,ブレインテック">
+  <meta property="og:title" content="meldworks Inc. | ウェアラブル脳波計 HUSH">
+  <meta property="og:description" content="脳波を、日常へ。耳の後ろに装着する超小型ウェアラブル脳波計HUSHで、自分の状態を深く理解する新時代へ。">
+  <meta property="og:type" content="website">
+  <title>meldworks Inc. | ウェアラブル脳波計 HUSH</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+  <!-- =============================
+       NAVIGATION
+  ============================== -->
+  <header id="site-header" class="site-header">
+    <nav class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-text">meldworks</span>
+        <span class="logo-tag">Inc.</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#technology">Technology</a></li>
+        <li><a href="#product">Product</a></li>
+        <li><a href="#use-cases">Use Cases</a></li>
+        <li><a href="pages/contact.html" class="nav-cta">Contact</a></li>
+      </ul>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <!-- Mobile menu -->
+    <div class="nav-mobile" id="nav-mobile">
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#technology">Technology</a></li>
+        <li><a href="#product">Product</a></li>
+        <li><a href="#use-cases">Use Cases</a></li>
+        <li><a href="pages/contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- =============================
+         HERO SECTION
+    ============================== -->
+    <section id="hero" class="section-hero">
+      <!-- Canvas for particle animation -->
+      <canvas id="hero-canvas" class="hero-canvas"></canvas>
+
+      <div class="hero-content">
+        <p class="hero-eyebrow fade-in-up">WEARABLE EEG</p>
+        <h1 class="hero-headline fade-in-up delay-1">
+          脳波を、<br>日常へ。
+        </h1>
+        <p class="hero-subline fade-in-up delay-2">
+          耳の後ろに装着する超小型ウェアラブル脳波計 <strong>HUSH</strong> で、<br class="pc-only">
+          あなたの状態を、より深く理解する時代が始まります。
+        </p>
+        <div class="hero-actions fade-in-up delay-3">
+          <a href="#product" class="btn-primary">製品を見る</a>
+          <a href="#about" class="btn-ghost">会社について</a>
+        </div>
+      </div>
+
+      <div class="hero-scroll-indicator">
+        <span class="scroll-line"></span>
+        <span class="scroll-label">SCROLL</span>
+      </div>
+    </section>
+
+    <!-- =============================
+         MESSAGE SECTION
+    ============================== -->
+    <section id="message" class="section-message">
+      <div class="container">
+        <div class="message-inner reveal">
+          <p class="message-label">OUR MISSION</p>
+          <h2 class="message-headline">
+            脳の情報は、まだ<br>日常では使われていない。
+          </h2>
+          <p class="message-body">
+            心拍、睡眠、活動量——現代のウェアラブルデバイスは、身体の多くを可視化しました。<br>
+            しかし脳の状態は、まだ日常の手が届かないところにあります。<br><br>
+            メルドワークスは、脳波をあたりまえの日常データにすることで、<br>
+            人が自分の内側をより深く知り、より自然に、より良いコンディションで過ごせる社会を目指しています。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         ABOUT SECTION
+    ============================== -->
+    <section id="about" class="section-about">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">ABOUT</p>
+          <h2 class="section-title">メルドワークスとは</h2>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-text reveal">
+            <p>
+              株式会社メルドワークスは、東京を拠点とするブレインテックスタートアップです。
+              これまで病院や研究機関でしか使えなかった脳波計を、
+              日常のウェアラブルデバイスとして再発明することに挑んでいます。
+            </p>
+            <p>
+              私たちの出発点は、「脳の状態が分かれば、人の生き方が変わる」という確信です。
+              ストレス、集中、疲労、覚醒——これらの情報が日常的に使えるようになったとき、
+              個人のパフォーマンスも、社会の在り方も、静かに変わっていくと考えています。
+            </p>
+            <a href="pages/about.html" class="link-arrow">会社情報の詳細 →</a>
+          </div>
+          <div class="about-stats reveal delay-1">
+            <div class="stat-item">
+              <span class="stat-number">EEG</span>
+              <span class="stat-desc">脳波計測技術</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">RT</span>
+              <span class="stat-desc">リアルタイム解析</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">IoT</span>
+              <span class="stat-desc">ワイヤレス接続</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         WHY BRAINWAVE SECTION
+    ============================== -->
+    <section id="why" class="section-why">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">WHY BRAINWAVE</p>
+          <h2 class="section-title">なぜ、脳波なのか。</h2>
+        </div>
+
+        <div class="why-grid">
+          <div class="why-card reveal">
+            <div class="why-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 24 Q18 16 24 24 Q30 32 36 24" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              </svg>
+            </div>
+            <h3>最も本質的な生体信号</h3>
+            <p>脳波は、思考・感情・集中・疲労・覚醒状態を直接反映する信号です。心拍や加速度では捉えられない内的状態を、リアルタイムで読み取ることができます。</p>
+          </div>
+          <div class="why-card reveal delay-1">
+            <div class="why-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M16 28 L20 20 L24 25 L28 18 L32 22" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              </svg>
+            </div>
+            <h3>まだ未開拓の領域</h3>
+            <p>ウェアラブル市場において、脳波の日常活用は世界的にもまだ発展途上です。技術的障壁が高い分、先行優位性が大きく、社会的インパクトも非常に大きい領域です。</p>
+          </div>
+          <div class="why-card reveal delay-2">
+            <div class="why-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="24" cy="24" r="14" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/>
+                <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="0.8" stroke-dasharray="2 4"/>
+              </svg>
+            </div>
+            <h3>行動変容への可能性</h3>
+            <p>単なる可視化にとどまらず、脳の状態に基づいたフィードバックや習慣最適化へとつなげることで、人々の日常を根本から改善できる可能性を持っています。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         PRODUCT SECTION
+    ============================== -->
+    <section id="product" class="section-product">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">PRODUCT</p>
+          <h2 class="section-title">HUSH</h2>
+          <p class="section-subtitle">ウェアラブル脳波計</p>
+        </div>
+
+        <div class="product-showcase reveal">
+          <!-- Product visual placeholder -->
+          <div class="product-visual">
+            <div class="product-glow"></div>
+            <div class="product-device">
+              <div class="device-body">
+                <span class="device-label">HUSH</span>
+                <span class="device-sub">by meldworks</span>
+              </div>
+              <div class="device-wave">
+                <svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path class="wave-path" d="M0 30 Q25 10 50 30 Q75 50 100 30 Q125 10 150 30 Q175 50 200 30" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-info">
+            <p class="product-description">
+              HUSHは、耳の後ろに装着するだけで脳波を計測できる、超小型のウェアラブルデバイスです。
+              日常生活の中で、あなたの状態を静かに観測し続けます。
+            </p>
+            <ul class="product-features">
+              <li>
+                <span class="feature-dot"></span>
+                <span>耳の後ろへの超小型装着設計</span>
+              </li>
+              <li>
+                <span class="feature-dot"></span>
+                <span>ワイヤレスによる快適な装着感</span>
+              </li>
+              <li>
+                <span class="feature-dot"></span>
+                <span>リアルタイム脳波計測</span>
+              </li>
+              <li>
+                <span class="feature-dot"></span>
+                <span>アプリ・解析ソフトとの連携構想</span>
+              </li>
+              <li>
+                <span class="feature-dot"></span>
+                <span>日常装着を前提とした設計思想</span>
+              </li>
+            </ul>
+            <a href="pages/product.html" class="btn-primary">製品詳細を見る</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         TECHNOLOGY SECTION
+    ============================== -->
+    <section id="technology" class="section-technology">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">TECHNOLOGY</p>
+          <h2 class="section-title">技術的強み</h2>
+        </div>
+
+        <div class="tech-grid">
+          <div class="tech-item reveal">
+            <div class="tech-number">01</div>
+            <h3>超小型設計</h3>
+            <p>耳の後ろという限られたスペースに、高精度の脳波センサーを収める独自の実装技術。日常装着を可能にするための設計思想が起点にあります。</p>
+          </div>
+          <div class="tech-item reveal delay-1">
+            <div class="tech-number">02</div>
+            <h3>ノイズ処理・信号処理</h3>
+            <p>日常環境では、体動・筋電・電磁ノイズが混入します。これらを精度高く除去し、クリーンな脳波信号を抽出するアルゴリズムを独自開発しています。</p>
+          </div>
+          <div class="tech-item reveal delay-2">
+            <div class="tech-number">03</div>
+            <h3>リアルタイム解析基盤</h3>
+            <p>計測した脳波を即座に解析し、ユーザーの状態推定へと変換するリアルタイム処理パイプラインを構築。低遅延での状態フィードバックを実現します。</p>
+          </div>
+          <div class="tech-item reveal delay-3">
+            <div class="tech-number">04</div>
+            <h3>データ活用・行動変容</h3>
+            <p>蓄積された個人の脳波データを基に、状態パターンの学習・最適化フィードバックへと展開するデータ基盤の構想を持っています。</p>
+          </div>
+        </div>
+
+        <div class="tech-cta reveal">
+          <a href="pages/technology.html" class="link-arrow">技術の詳細を見る →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         USE CASES SECTION
+    ============================== -->
+    <section id="use-cases" class="section-use-cases">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">USE CASES</p>
+          <h2 class="section-title">活用シーン</h2>
+        </div>
+
+        <div class="usecase-tabs reveal">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="sports">スポーツ</button>
+            <button class="tab-btn" data-tab="research">研究・教育</button>
+            <button class="tab-btn" data-tab="enterprise">企業・産業</button>
+            <button class="tab-btn" data-tab="personal">個人</button>
+          </div>
+
+          <div class="tab-content">
+            <div class="tab-panel active" id="tab-sports">
+              <div class="tab-panel-inner">
+                <div class="tab-text">
+                  <h3>スポーツチーム・アスリート</h3>
+                  <p>集中状態・覚醒レベル・メンタルコンディションのリアルタイム把握が可能になります。トレーニングの質を高め、試合前の状態最適化にも活用できる可能性があります。</p>
+                  <ul>
+                    <li>集中状態のモニタリング</li>
+                    <li>試合前コンディション確認</li>
+                    <li>メンタルトレーニングへの応用</li>
+                  </ul>
+                </div>
+                <div class="tab-visual sports-visual">
+                  <div class="visual-label">SPORT &amp; PERFORMANCE</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-panel" id="tab-research">
+              <div class="tab-panel-inner">
+                <div class="tab-text">
+                  <h3>研究機関・大学</h3>
+                  <p>日常環境での脳波データ取得が可能になることで、実験室外での認知科学研究・神経科学研究の可能性が広がります。小型・携帯性に優れた計測ツールとして活用できます。</p>
+                  <ul>
+                    <li>フィールド認知神経科学研究</li>
+                    <li>行動実験への組み込み</li>
+                    <li>脳波データセット構築</li>
+                  </ul>
+                </div>
+                <div class="tab-visual research-visual">
+                  <div class="visual-label">RESEARCH &amp; EDUCATION</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-panel" id="tab-enterprise">
+              <div class="tab-panel-inner">
+                <div class="tab-text">
+                  <h3>企業・産業現場</h3>
+                  <p>製造・建設・運輸など、集中力や覚醒度が安全に直結する現場での活用が期待されます。作業者の状態モニタリングにより、ヒューマンエラー防止や安全管理の高度化に貢献します。</p>
+                  <ul>
+                    <li>作業者の覚醒度モニタリング</li>
+                    <li>安全管理・疲労検知</li>
+                    <li>産業メンタルヘルス支援</li>
+                  </ul>
+                </div>
+                <div class="tab-visual enterprise-visual">
+                  <div class="visual-label">ENTERPRISE &amp; INDUSTRY</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-panel" id="tab-personal">
+              <div class="tab-panel-inner">
+                <div class="tab-text">
+                  <h3>個人・セルフケア</h3>
+                  <p>自分のコンディションを客観的に知り、日々の生活パターンを最適化したい方へ。集中・リラックス・睡眠など、自分の状態をデータとして理解することで、より良い習慣づくりをサポートします。</p>
+                  <ul>
+                    <li>日常コンディション管理</li>
+                    <li>集中・リラックスの可視化</li>
+                    <li>パフォーマンス最適化</li>
+                  </ul>
+                </div>
+                <div class="tab-visual personal-visual">
+                  <div class="visual-label">PERSONAL &amp; WELLNESS</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         VISION SECTION
+    ============================== -->
+    <section id="vision" class="section-vision">
+      <canvas id="vision-canvas" class="vision-canvas"></canvas>
+      <div class="container">
+        <div class="vision-inner reveal">
+          <p class="section-label">VISION</p>
+          <h2 class="vision-headline">
+            自分の状態を知ることが、<br>
+            あたりまえになる社会へ。
+          </h2>
+          <p class="vision-body">
+            脳波はかつて、特別な場所・特別な人のためのものでした。<br>
+            私たちは、それを変えようとしています。<br><br>
+            自分の集中を知り、疲労を知り、回復を知る。<br>
+            その情報が日常にあることで、人はより自然に、より賢く、自分を管理できるようになります。<br><br>
+            メルドワークスは、脳波という静かな信号から、<br>人の可能性を広げることに挑み続けます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         COMPANY OVERVIEW SECTION
+    ============================== -->
+    <section id="company" class="section-company">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-label">COMPANY</p>
+          <h2 class="section-title">会社概要</h2>
+        </div>
+
+        <div class="company-table-wrap reveal">
+          <table class="company-table">
+            <tbody>
+              <tr>
+                <th>会社名</th>
+                <td>株式会社メルドワークス（meldworks Inc.）</td>
+              </tr>
+              <tr>
+                <th>所在地</th>
+                <td>東京都</td>
+              </tr>
+              <tr>
+                <th>事業内容</th>
+                <td>ウェアラブル脳波計の開発および、それを用いたソフトウェア・データ活用サービスの提供</td>
+              </tr>
+              <tr>
+                <th>主力製品</th>
+                <td>HUSH（ウェアラブル脳波計）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="company-cta reveal">
+          <a href="pages/about.html" class="btn-ghost">会社情報の詳細を見る</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============================
+         CONTACT CTA SECTION
+    ============================== -->
+    <section id="contact-cta" class="section-contact-cta">
+      <div class="container">
+        <div class="contact-cta-inner reveal">
+          <p class="section-label">CONTACT</p>
+          <h2 class="contact-cta-headline">
+            お気軽にご連絡ください。
+          </h2>
+          <p class="contact-cta-body">
+            製品・技術・採用・事業連携など、どのようなご相談もお待ちしています。
+          </p>
+          <a href="pages/contact.html" class="btn-primary btn-large">お問い合わせ</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =============================
+       FOOTER
+  ============================== -->
+  <footer id="site-footer" class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <p class="footer-logo">meldworks</p>
+          <p class="footer-tagline">脳波を、日常へ。</p>
+        </div>
+        <nav class="footer-nav">
+          <ul>
+            <li><a href="pages/about.html">About</a></li>
+            <li><a href="pages/technology.html">Technology</a></li>
+            <li><a href="pages/product.html">Product</a></li>
+            <li><a href="pages/contact.html">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2024 meldworks Inc. All rights reserved.</p>
+        <p class="footer-address">東京都</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+</body>
+</html>

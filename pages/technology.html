@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="メルドワークスの技術力。超小型設計・ノイズ処理・リアルタイム解析・データ活用の4つの技術的強みを紹介します。">
+  <title>Technology | meldworks Inc.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    /* Technology ページ固有スタイル */
+    .tech-detail-section {
+      padding: 80px 0;
+    }
+    .tech-detail-section:nth-child(even) {
+      background: var(--color-bg-alt);
+    }
+    .tech-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 8vw, 100px);
+      align-items: center;
+    }
+    .tech-detail-grid.reverse {
+      direction: rtl;
+    }
+    .tech-detail-grid.reverse > * {
+      direction: ltr;
+    }
+    .tech-detail-num {
+      font-family: var(--font-en);
+      font-size: 5rem;
+      font-weight: 300;
+      color: var(--color-text-faint);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .tech-detail-title {
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--color-white);
+      margin-bottom: 20px;
+    }
+    .tech-detail-body {
+      color: var(--color-text-muted);
+      line-height: 2;
+      font-size: 0.95rem;
+    }
+    .tech-visual-box {
+      aspect-ratio: 4/3;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .tech-visual-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, var(--color-accent-glow) 0%, transparent 65%);
+    }
+    .tech-visual-label {
+      font-family: var(--font-en);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--color-text-faint);
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 900px) {
+      .tech-detail-grid { grid-template-columns: 1fr; }
+      .tech-detail-grid.reverse { direction: ltr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header id="site-header" class="site-header scrolled">
+    <nav class="nav-container">
+      <a href="../index.html" class="nav-logo">
+        <span class="logo-text">meldworks</span>
+        <span class="logo-tag">Inc.</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="technology.html" style="color: var(--color-accent);">Technology</a></li>
+        <li><a href="../index.html#product">Product</a></li>
+        <li><a href="../index.html#use-cases">Use Cases</a></li>
+        <li><a href="contact.html" class="nav-cta">Contact</a></li>
+      </ul>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <div class="nav-mobile" id="nav-mobile">
+      <ul>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="technology.html">Technology</a></li>
+        <li><a href="../index.html#product">Product</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+      <div class="container">
+        <span class="section-label">TECHNOLOGY</span>
+        <h1>私たちの技術</h1>
+        <p style="color: var(--color-text-muted); margin-top: 16px; font-size: 1rem;">脳波を日常へ届けるための、4つの技術的基盤</p>
+      </div>
+    </section>
+
+    <!-- TECH 01: 超小型設計 -->
+    <section class="tech-detail-section">
+      <div class="container">
+        <div class="tech-detail-grid reveal">
+          <div>
+            <div class="tech-detail-num">01</div>
+            <h2 class="tech-detail-title">超小型設計</h2>
+            <p class="tech-detail-body">
+              脳波計の日常活用における最大の障壁は「装着性」です。
+              メルドワークスは、耳の後ろという極めて限られたスペースに高精度のEEGセンサーを収めるための、
+              独自の小型化・実装技術を開発しています。<br><br>
+              従来の研究用EEG装置は頭部全体を覆う大型のものが主流でしたが、
+              HUSHはその概念を根本から覆す超小型設計を追求しています。
+              日常装着が可能であること——それが私たちの設計思想のすべての起点です。
+            </p>
+          </div>
+          <div class="tech-visual-box">
+            <span class="tech-visual-label">MINIATURIZED EEG SENSOR</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH 02: ノイズ処理 -->
+    <section class="tech-detail-section">
+      <div class="container">
+        <div class="tech-detail-grid reverse reveal">
+          <div>
+            <div class="tech-detail-num">02</div>
+            <h2 class="tech-detail-title">ノイズ処理・信号処理</h2>
+            <p class="tech-detail-body">
+              日常環境における脳波計測の難しさは、ノイズにあります。
+              歩行・表情・眼球運動などの体動ノイズ、環境電磁波、筋電信号——これらが脳波と混在し、
+              研究室外での正確な計測を困難にしてきました。<br><br>
+              メルドワークスは、日常環境を想定した独自のノイズ除去アルゴリズムと信号処理パイプラインを開発しています。
+              クリーンな脳波信号の抽出こそが、有意義なデータ活用の前提条件です。
+            </p>
+          </div>
+          <div class="tech-visual-box">
+            <span class="tech-visual-label">NOISE FILTERING &amp; SIGNAL PROCESSING</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH 03: リアルタイム解析 -->
+    <section class="tech-detail-section">
+      <div class="container">
+        <div class="tech-detail-grid reveal">
+          <div>
+            <div class="tech-detail-num">03</div>
+            <h2 class="tech-detail-title">リアルタイム解析基盤</h2>
+            <p class="tech-detail-body">
+              収集した脳波データを即座に意味ある情報へと変換するリアルタイム解析基盤を構築しています。
+              集中・リラックス・覚醒・疲労といった認知状態の推定を、低遅延で処理するパイプラインは、
+              ユーザーへの即時フィードバックを可能にします。<br><br>
+              アプリやソフトウェアとの連携を見据えた設計により、
+              脳波データをその場で「使える情報」に変えることを実現します。
+            </p>
+          </div>
+          <div class="tech-visual-box">
+            <span class="tech-visual-label">REAL-TIME ANALYSIS PIPELINE</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH 04: データ活用 -->
+    <section class="tech-detail-section">
+      <div class="container">
+        <div class="tech-detail-grid reverse reveal">
+          <div>
+            <div class="tech-detail-num">04</div>
+            <h2 class="tech-detail-title">データ活用・行動変容支援</h2>
+            <p class="tech-detail-body">
+              私たちの最終的な目標は、脳波データの単なる可視化ではありません。
+              蓄積された個人の脳波パターンを学習し、その人に最適化された行動・習慣・コンディション管理への
+              フィードバックを提供することです。<br><br>
+              個人差の大きい脳波データをどう解釈し、どう行動変容につなげるか——
+              このデータ活用基盤の構築が、メルドワークスが目指す次のフロンティアです。
+            </p>
+          </div>
+          <div class="tech-visual-box">
+            <span class="tech-visual-label">DATA UTILIZATION &amp; BEHAVIOR CHANGE</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section style="padding: 120px 0;">
+      <div class="container">
+        <div class="contact-cta-inner reveal">
+          <span class="section-label">CONTACT</span>
+          <h2 class="contact-cta-headline">技術について詳しく知りたい方へ</h2>
+          <p class="contact-cta-body">研究連携・技術情報の詳細・産学連携など、お気軽にご連絡ください。</p>
+          <a href="contact.html" class="btn-primary btn-large">お問い合わせ</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="site-footer" class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <p class="footer-logo">meldworks</p>
+          <p class="footer-tagline">脳波を、日常へ。</p>
+        </div>
+        <nav class="footer-nav">
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="product.html">Product</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2024 meldworks Inc. All rights reserved.</p>
+        <p class="footer-address">東京都</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

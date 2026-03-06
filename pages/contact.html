@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="株式会社メルドワークスへのお問い合わせ。製品・技術・採用・事業連携など、あらゆるご相談をお待ちしています。">
+  <title>Contact | meldworks Inc.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    /* Contact ページ固有スタイル */
+    .contact-section {
+      padding: 80px 0 120px;
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: clamp(40px, 8vw, 100px);
+      align-items: start;
+    }
+    .contact-info h2 {
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: var(--color-white);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .contact-info p {
+      color: var(--color-text-muted);
+      line-height: 2;
+      font-size: 0.9rem;
+      margin-bottom: 40px;
+    }
+    .contact-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .contact-category {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .contact-cat-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+    .contact-cat-text strong {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+    .contact-cat-text span {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Form */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-group label {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      font-family: var(--font-en);
+      letter-spacing: 0.05em;
+    }
+    .form-group label .required {
+      color: var(--color-accent);
+      margin-left: 4px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+      font-family: var(--font-ja);
+      font-size: 0.9rem;
+      border-radius: 2px;
+      transition: border-color var(--dur-fast);
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--color-accent);
+    }
+    .form-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888899' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      cursor: pointer;
+    }
+    .form-group select option {
+      background: var(--color-bg-card);
+      color: var(--color-text);
+    }
+    .form-group textarea {
+      min-height: 160px;
+      resize: vertical;
+      line-height: 1.8;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-note {
+      font-size: 0.78rem;
+      color: var(--color-text-faint);
+      line-height: 1.7;
+    }
+    .form-submit {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .form-submit .btn-primary {
+      padding: 16px 48px;
+    }
+
+    /* Success message (hidden by default) */
+    .form-success {
+      display: none;
+      padding: 24px;
+      background: rgba(240, 112, 48, 0.08);
+      border: 1px solid var(--color-border-hov);
+      border-radius: 2px;
+      color: var(--color-text);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 900px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header id="site-header" class="site-header scrolled">
+    <nav class="nav-container">
+      <a href="../index.html" class="nav-logo">
+        <span class="logo-text">meldworks</span>
+        <span class="logo-tag">Inc.</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="technology.html">Technology</a></li>
+        <li><a href="product.html">Product</a></li>
+        <li><a href="../index.html#use-cases">Use Cases</a></li>
+        <li><a href="contact.html" class="nav-cta" style="color: var(--color-accent);">Contact</a></li>
+      </ul>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <div class="nav-mobile" id="nav-mobile">
+      <ul>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="technology.html">Technology</a></li>
+        <li><a href="product.html">Product</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+      <div class="container">
+        <span class="section-label">CONTACT</span>
+        <h1>お問い合わせ</h1>
+      </div>
+    </section>
+
+    <!-- CONTACT FORM -->
+    <section class="contact-section">
+      <div class="container">
+        <div class="contact-grid">
+
+          <!-- LEFT: Info -->
+          <div class="contact-info reveal">
+            <h2>あらゆるご相談を<br>お待ちしています。</h2>
+            <p>
+              製品・技術・採用・事業連携・取材など、
+              どのようなご相談もお気軽にお問い合わせください。<br>
+              担当者より折り返しご連絡いたします。
+            </p>
+
+            <div class="contact-categories">
+              <div class="contact-category">
+                <span class="contact-cat-dot"></span>
+                <div class="contact-cat-text">
+                  <strong>製品・技術情報</strong>
+                  <span>HUSHの詳細資料・技術仕様・デモのご要望</span>
+                </div>
+              </div>
+              <div class="contact-category">
+                <span class="contact-cat-dot"></span>
+                <div class="contact-cat-text">
+                  <strong>事業連携・導入</strong>
+                  <span>共同研究・OEM・産学連携・導入のご相談</span>
+                </div>
+              </div>
+              <div class="contact-category">
+                <span class="contact-cat-dot"></span>
+                <div class="contact-cat-text">
+                  <strong>採用</strong>
+                  <span>エンジニア・研究者・ビジネス職のご応募</span>
+                </div>
+              </div>
+              <div class="contact-category">
+                <span class="contact-cat-dot"></span>
+                <div class="contact-cat-text">
+                  <strong>投資家・メディア</strong>
+                  <span>IR情報・取材・プレスリリースのご依頼</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Form -->
+          <div class="reveal delay-1">
+            <!-- Success message -->
+            <div class="form-success" id="form-success">
+              お問い合わせありがとうございます。<br>
+              内容を確認の上、担当者よりご連絡いたします。<br>
+              （通常2〜3営業日以内にご返答いたします）
+            </div>
+
+            <form class="contact-form" id="contact-form" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">お名前 <span class="required">*</span></label>
+                  <input type="text" id="name" name="name" placeholder="山田 太郎" required>
+                </div>
+                <div class="form-group">
+                  <label for="company">会社名・所属</label>
+                  <input type="text" id="company" name="company" placeholder="株式会社〇〇">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">メールアドレス <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+              </div>
+
+              <div class="form-group">
+                <label for="category">お問い合わせの種類</label>
+                <select id="category" name="category">
+                  <option value="">選択してください</option>
+                  <option value="product">製品・技術情報</option>
+                  <option value="business">事業連携・導入</option>
+                  <option value="career">採用</option>
+                  <option value="press">投資家・メディア</option>
+                  <option value="other">その他</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="message">お問い合わせ内容 <span class="required">*</span></label>
+                <textarea id="message" name="message" placeholder="ご質問・ご相談内容をご記入ください。" required></textarea>
+              </div>
+
+              <p class="form-note">
+                ※ ご入力いただいた個人情報は、お問い合わせへの回答のみに利用し、第三者への提供は行いません。<br>
+                ※ 必須項目（<span style="color: var(--color-accent);">*</span>）のご入力をお願いします。
+              </p>
+
+              <div class="form-submit">
+                <button type="submit" class="btn-primary">送信する</button>
+                <span class="form-note" style="margin-top: 0;">通常2〜3営業日以内にご返答します</span>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="site-footer" class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <p class="footer-logo">meldworks</p>
+          <p class="footer-tagline">脳波を、日常へ。</p>
+        </div>
+        <nav class="footer-nav">
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="product.html">Product</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2024 meldworks Inc. All rights reserved.</p>
+        <p class="footer-address">東京都</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    /**
+     * Contact フォーム送信処理
+     * 現在はデモとして送信成功UIを表示するのみ。
+     * 実際の送信はFormspree / Netlify Forms / バックエンドAPIに差し替えてください。
+     */
+    (function initContactForm() {
+      const form    = document.getElementById('contact-form');
+      const success = document.getElementById('form-success');
+      if (!form) return;
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // 必須バリデーション
+        const name    = form.querySelector('#name').value.trim();
+        const email   = form.querySelector('#email').value.trim();
+        const message = form.querySelector('#message').value.trim();
+
+        if (!name || !email || !message) {
+          alert('必須項目を入力してください。');
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          alert('正しいメールアドレスを入力してください。');
+          return;
+        }
+
+        // 送信成功UI（デモ）
+        form.style.display = 'none';
+        success.style.display = 'block';
+      });
+    })();
+  </script>
+</body>
+</html>

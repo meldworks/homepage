@@ -342,7 +342,7 @@
     (function initContactForm() {
       const form    = document.getElementById('contact-form');
       const success = document.getElementById('form-success');
-      const WEBHOOK = 'https://hooks.slack.com/services/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';
+      const WEBHOOK = 'https://hook.us2.make.com/mivxe5sxoefo1s5qfk63opt2b9p7foro';
       if (!form) return;
 
       const CATEGORY_LABELS = {
@@ -377,32 +377,17 @@
         submitBtn.textContent = '送信中...';
 
         const payload = {
-          blocks: [
-            {
-              type: 'header',
-              text: { type: 'plain_text', text: '📬 新しいお問い合わせ', emoji: true }
-            },
-            {
-              type: 'section',
-              fields: [
-                { type: 'mrkdwn', text: `*お名前*\n${name}` },
-                { type: 'mrkdwn', text: `*会社名・所属*\n${company || '—'}` },
-                { type: 'mrkdwn', text: `*メールアドレス*\n${email}` },
-                { type: 'mrkdwn', text: `*種別*\n${CATEGORY_LABELS[category]}` },
-              ]
-            },
-            {
-              type: 'section',
-              text: { type: 'mrkdwn', text: `*お問い合わせ内容*\n${message}` }
-            },
-            { type: 'divider' }
-          ]
+          name:     name,
+          company:  company || '—',
+          email:    email,
+          category: CATEGORY_LABELS[category],
+          message:  message,
         };
 
         fetch(WEBHOOK, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: 'payload=' + encodeURIComponent(JSON.stringify(payload))
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         })
         .then(function() {
           form.style.display = 'none';

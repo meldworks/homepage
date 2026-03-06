@@ -154,10 +154,10 @@
         this.y   = Math.random() * H;
         this.age = Math.random() * this.maxLife;
       } else {
-        // 再スポーン：画面内の左上エリアにランダム出現（低速でも常に見える状態を保つ）
+        // 再スポーン：画面全体にランダム出現
         this.age = 0;
-        this.x = Math.random() * W * 0.7;
-        this.y = Math.random() * H * 0.6;
+        this.x = Math.random() * W;
+        this.y = Math.random() * H;
       }
     }
 

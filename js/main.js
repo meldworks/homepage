@@ -118,18 +118,18 @@
   let W, H, stars, animId;
 
   // Shooting star constants（値の調整ポイント）
-  const STAR_COUNT           = 10;    // 同時表示数 → 増やすと賑やか
+  const STAR_COUNT           = 8;     // 同時表示数 → 増やすと賑やか
   const STAR_ANGLE           = 30 * (Math.PI / 180); // 流れる角度（deg）→ 30 = 右下方向
   const STAR_DX              = Math.cos(STAR_ANGLE);  // ≈  0.866
   const STAR_DY              = Math.sin(STAR_ANGLE);  // ≈  0.500
   const STAR_SPEED_MIN       = 6;     // 最低速度（px/frame）→ 遅くすると優雅
   const STAR_SPEED_MAX       = 14;    // 最高速度
-  const STAR_LENGTH_MIN      = 80;    // 最短の尾（px）
-  const STAR_LENGTH_MAX      = 220;   // 最長の尾
-  const STAR_ALPHA_MIN       = 0.50;  // 最低透明度
-  const STAR_ALPHA_MAX       = 0.90;  // 最高透明度
-  const STAR_WIDTH_MIN       = 1.0;   // 最細線幅（px）
-  const STAR_WIDTH_MAX       = 2.2;   // 最太線幅
+  const STAR_LENGTH_MIN      = 60;    // 最短の尾（px）
+  const STAR_LENGTH_MAX      = 160;   // 最長の尾
+  const STAR_ALPHA_MIN       = 0.25;  // 最低透明度
+  const STAR_ALPHA_MAX       = 0.50;  // 最高透明度
+  const STAR_WIDTH_MIN       = 0.7;   // 最細線幅（px）
+  const STAR_WIDTH_MAX       = 1.4;   // 最太線幅
   const STAR_FADE_IN         = 8;     // フェードイン フレーム数（短いほど突然現れる）
   const STAR_FADE_OUT        = 25;    // フェードアウト フレーム数（長いほどゆっくり消える）
   const STAR_LIFE_ACTIVE_MIN = 30;    // 活動フレーム数（最小）

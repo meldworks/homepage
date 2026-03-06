@@ -122,18 +122,18 @@
   const STAR_ANGLE           = 30 * (Math.PI / 180); // 流れる角度（deg）→ 30 = 右下方向
   const STAR_DX              = Math.cos(STAR_ANGLE);  // ≈  0.866
   const STAR_DY              = Math.sin(STAR_ANGLE);  // ≈  0.500
-  const STAR_SPEED_MIN       = 0.6;   // 最低速度（px/frame）→ 遅くすると優雅
-  const STAR_SPEED_MAX       = 1.5;   // 最高速度
+  const STAR_SPEED_MIN       = 1.0;   // 最低速度（px/frame）→ 遅くすると優雅
+  const STAR_SPEED_MAX       = 2.5;   // 最高速度
   const STAR_LENGTH_MIN      = 60;    // 最短の尾（px）
   const STAR_LENGTH_MAX      = 160;   // 最長の尾
-  const STAR_ALPHA_MIN       = 0.30;  // 最低透明度
-  const STAR_ALPHA_MAX       = 0.60;  // 最高透明度
+  const STAR_ALPHA_MIN       = 0.55;  // 最低透明度
+  const STAR_ALPHA_MAX       = 0.80;  // 最高透明度
   const STAR_WIDTH_MIN       = 0.7;   // 最細線幅（px）
   const STAR_WIDTH_MAX       = 1.4;   // 最太線幅
   const STAR_FADE_IN         = 8;     // フェードイン フレーム数（短いほど突然現れる）
   const STAR_FADE_OUT        = 25;    // フェードアウト フレーム数（長いほどゆっくり消える）
-  const STAR_LIFE_ACTIVE_MIN = 30;    // 活動フレーム数（最小）
-  const STAR_LIFE_ACTIVE_MAX = 80;    // 活動フレーム数（最大）
+  const STAR_LIFE_ACTIVE_MIN = 60;    // 活動フレーム数（最小）
+  const STAR_LIFE_ACTIVE_MAX = 150;   // 活動フレーム数（最大）
 
   class ShootingStar {
     constructor() { this.reset(true); }

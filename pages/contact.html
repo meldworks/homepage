@@ -342,15 +342,26 @@
     (function initContactForm() {
       const form    = document.getElementById('contact-form');
       const success = document.getElementById('form-success');
+      const WEBHOOK = 'https://hooks.slack.com/services/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';
       if (!form) return;
+
+      const CATEGORY_LABELS = {
+        product:  '製品・技術情報',
+        business: '事業連携・導入',
+        career:   '採用',
+        press:    '投資家・メディア',
+        other:    'その他',
+        '':       '未選択',
+      };
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // 必須バリデーション
-        const name    = form.querySelector('#name').value.trim();
-        const email   = form.querySelector('#email').value.trim();
-        const message = form.querySelector('#message').value.trim();
+        const name     = form.querySelector('#name').value.trim();
+        const company  = form.querySelector('#company').value.trim();
+        const email    = form.querySelector('#email').value.trim();
+        const category = form.querySelector('#category').value;
+        const message  = form.querySelector('#message').value.trim();
 
         if (!name || !email || !message) {
           alert('必須項目を入力してください。');
@@ -361,9 +372,47 @@
           return;
         }
 
-        // 送信成功UI（デモ）
-        form.style.display = 'none';
-        success.style.display = 'block';
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '送信中...';
+
+        const payload = {
+          blocks: [
+            {
+              type: 'header',
+              text: { type: 'plain_text', text: '📬 新しいお問い合わせ', emoji: true }
+            },
+            {
+              type: 'section',
+              fields: [
+                { type: 'mrkdwn', text: `*お名前*\n${name}` },
+                { type: 'mrkdwn', text: `*会社名・所属*\n${company || '—'}` },
+                { type: 'mrkdwn', text: `*メールアドレス*\n${email}` },
+                { type: 'mrkdwn', text: `*種別*\n${CATEGORY_LABELS[category]}` },
+              ]
+            },
+            {
+              type: 'section',
+              text: { type: 'mrkdwn', text: `*お問い合わせ内容*\n${message}` }
+            },
+            { type: 'divider' }
+          ]
+        };
+
+        fetch(WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'payload=' + encodeURIComponent(JSON.stringify(payload))
+        })
+        .then(function() {
+          form.style.display = 'none';
+          success.style.display = 'block';
+        })
+        .catch(function() {
+          alert('送信に失敗しました。時間をおいて再度お試しください。');
+          submitBtn.disabled = false;
+          submitBtn.textContent = '送信する';
+        });
       });
     })();
   </script>

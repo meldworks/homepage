@@ -117,75 +117,57 @@
   const ctx = canvas.getContext('2d');
   let W, H, stars, animId;
 
-  // Shooting star constants（値の調整ポイント）
-  const STAR_COUNT           = 8;     // 同時表示数 → 増やすと賑やか
-  const STAR_ANGLE           = 30 * (Math.PI / 180); // 流れる角度（deg）→ 30 = 右下方向
-  const STAR_DX              = Math.cos(STAR_ANGLE);  // ≈  0.866
-  const STAR_DY              = Math.sin(STAR_ANGLE);  // ≈  0.500
-  const STAR_SPEED_MIN       = 1.0;   // 最低速度（px/frame）→ 遅くすると優雅
-  const STAR_SPEED_MAX       = 2.5;   // 最高速度
-  const STAR_LENGTH_MIN      = 60;    // 最短の尾（px）
-  const STAR_LENGTH_MAX      = 160;   // 最長の尾
-  const STAR_ALPHA_MIN       = 0.55;  // 最低透明度
-  const STAR_ALPHA_MAX       = 0.80;  // 最高透明度
-  const STAR_WIDTH_MIN       = 0.7;   // 最細線幅（px）
-  const STAR_WIDTH_MAX       = 1.4;   // 最太線幅
-  const STAR_FADE_IN         = 8;     // フェードイン フレーム数（短いほど突然現れる）
-  const STAR_FADE_OUT        = 25;    // フェードアウト フレーム数（長いほどゆっくり消える）
-  const STAR_LIFE_ACTIVE_MIN = 60;    // 活動フレーム数（最小）
-  const STAR_LIFE_ACTIVE_MAX = 150;   // 活動フレーム数（最大）
+  const STAR_COUNT = 10; // 同時表示数
 
   class ShootingStar {
     constructor() { this.reset(true); }
 
     reset(init = false) {
-      this.speed   = STAR_SPEED_MIN + Math.random() * (STAR_SPEED_MAX - STAR_SPEED_MIN);
-      this.length  = STAR_LENGTH_MIN + Math.random() * (STAR_LENGTH_MAX - STAR_LENGTH_MIN);
-      this.alpha   = STAR_ALPHA_MIN + Math.random() * (STAR_ALPHA_MAX - STAR_ALPHA_MIN);
-      this.width   = STAR_WIDTH_MIN + Math.random() * (STAR_WIDTH_MAX - STAR_WIDTH_MIN);
-      this.vx      = STAR_DX * this.speed;
-      this.vy      = STAR_DY * this.speed;
-      const active = STAR_LIFE_ACTIVE_MIN + Math.random() * (STAR_LIFE_ACTIVE_MAX - STAR_LIFE_ACTIVE_MIN);
-      this.maxLife = STAR_FADE_IN + active + STAR_FADE_OUT;
+      // 各星ごとに完全にランダムな個性を持たせる
+      this.speed   = 0.4 + Math.random() * 3.5;              // 0.4〜3.9 px/f（遅い星〜速い星）
+      this.length  = 30 + Math.random() * 180;               // 30〜210 px（短い尾〜長い尾）
+      this.alpha   = 0.30 + Math.random() * 0.55;            // 0.30〜0.85（薄い〜濃い）
+      this.width   = 0.4 + Math.random() * 1.8;              // 0.4〜2.2 px（細い〜太い）
+      this.fadeIn  = 4 + Math.random() * 20;                 // 4〜24 f（ぱっと現れる〜ゆっくり現れる）
+      this.fadeOut = 15 + Math.random() * 60;                // 15〜75 f（さっと消える〜ゆっくり消える）
+      const active = 30 + Math.random() * 200;               // 30〜230 f（短命〜長命）
+      this.maxLife = this.fadeIn + active + this.fadeOut;
 
-      if (init) {
-        // 初期ロード時：ライフサイクルをランダムにずらして自然に見せる
-        this.x   = Math.random() * W;
-        this.y   = Math.random() * H;
-        this.age = Math.random() * this.maxLife;
-      } else {
-        // 再スポーン：画面全体にランダム出現
-        this.age = 0;
-        this.x = Math.random() * W;
-        this.y = Math.random() * H;
-      }
+      // 角度もわずかにばらつかせて自然な群れ感を出す（25°〜40°）
+      const angle = (25 + Math.random() * 15) * (Math.PI / 180);
+      this.vx = Math.cos(angle) * this.speed;
+      this.vy = Math.sin(angle) * this.speed;
+
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.age = init ? Math.random() * this.maxLife : 0;
     }
 
     update() {
       this.x += this.vx;
       this.y += this.vy;
       this.age++;
-      // ライフサイクル終了 or 画面外に出たらリセット
       if (this.age >= this.maxLife || this.x > W + this.length || this.y > H + this.length) {
         this.reset();
       }
     }
 
     draw() {
-      // フェードイン・持続・フェードアウトのライフサイクルで透明度を制御
       let t;
-      if (this.age < STAR_FADE_IN) {
-        t = this.age / STAR_FADE_IN;                            // 素早く現れる
-      } else if (this.age < this.maxLife - STAR_FADE_OUT) {
-        t = 1.0;                                                 // 持続
+      if (this.age < this.fadeIn) {
+        t = this.age / this.fadeIn;
+      } else if (this.age < this.maxLife - this.fadeOut) {
+        t = 1.0;
       } else {
-        t = (this.maxLife - this.age) / STAR_FADE_OUT;          // ゆっくり消える
+        t = (this.maxLife - this.age) / this.fadeOut;
       }
       const effectiveAlpha = this.alpha * Math.max(0, t);
       if (effectiveAlpha <= 0.01) return;
 
-      const tx = this.x - STAR_DX * this.length; // 尾の先端 x
-      const ty = this.y - STAR_DY * this.length; // 尾の先端 y
+      // 尾の方向は各星の実際の速度ベクトルに基づく
+      const len = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+      const tx = this.x - (this.vx / len) * this.length;
+      const ty = this.y - (this.vy / len) * this.length;
 
       const grad = ctx.createLinearGradient(tx, ty, this.x, this.y);
       grad.addColorStop(0, `rgba(255, 255, 255, 0)`);

@@ -501,10 +501,11 @@ button {
 
 .stat-number {
   font-family: var(--font-en);
-  font-size: 1.25rem;
-  font-weight: 300;
+  font-size: 1rem;
+  font-weight: 400;
   color: var(--color-accent);
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .stat-desc {

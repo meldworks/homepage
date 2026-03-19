@@ -3,13 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="HUSH — メルドワークスのウェアラブル脳波計。耳の後ろに装着するだけで、日常の中で脳波を計測できます。">
+
+  <!-- Security -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com; img-src 'self' data: https://www.google-analytics.com; frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+
+  <!-- SEO -->
   <title>Product — HUSH | meldworks</title>
+  <meta name="description" content="HUSH — メルドワークスのウェアラブル脳波計。耳の後ろに装着するだけで、日常の中で脳波を計測できます。超小型・軽量設計で、スポーツ・ヘルスケア・研究など幅広い用途に対応。">
+  <meta name="keywords" content="HUSH,脳波計,ウェアラブル脳波計,EEG,メルドワークス,meldworks,脳波センサー,ウェアラブルデバイス">
+  <link rel="canonical" href="https://meldworks.co.jp/pages/product.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="meldworks">
+  <meta property="og:title" content="Product — HUSH | meldworks">
+  <meta property="og:description" content="HUSH — メルドワークスのウェアラブル脳波計。耳の後ろに装着するだけで、日常の中で脳波を計測できます。">
+  <meta property="og:url" content="https://meldworks.co.jp/pages/product.html">
+  <meta property="og:image" content="https://meldworks.co.jp/assets/ogp.png">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Product — HUSH | meldworks">
+  <meta name="twitter:description" content="HUSH — メルドワークスのウェアラブル脳波計。耳の後ろに装着するだけで、日常の中で脳波を計測できます。">
+  <meta name="twitter:image" content="https://meldworks.co.jp/assets/ogp.png">
+
+  <!-- JSON-LD: Product -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "HUSH",
+    "description": "耳の後ろに装着するウェアラブル脳波計。超小型・軽量設計で日常の脳波計測を実現。",
+    "brand": {
+      "@type": "Brand",
+      "name": "meldworks"
+    },
+    "manufacturer": {
+      "@type": "Organization",
+      "name": "株式会社メルドワークス",
+      "url": "https://meldworks.co.jp/"
+    },
+    "image": "https://meldworks.co.jp/assets/ogp.png",
+    "url": "https://meldworks.co.jp/pages/product.html",
+    "category": "ウェアラブルデバイス"
+  }
+  </script>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/animations.css">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-05HC1YK7ZW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-05HC1YK7ZW');
+  </script>
   <style>
     /* Product ページ固有スタイル */
     .product-hero-section {
@@ -201,11 +258,11 @@
             <h2 class="hush-name">HUSH</h2>
             <p class="hush-tagline">ウェアラブル脳波計</p>
             <p class="hush-desc">
-              HUSHは、耳の後ろに装着するだけで脳波を計測できる、世界最小クラスのウェアラブルEEGデバイスです。
+              HUSHは、イヤホンのように装着するだけで脳波を計測できる、世界最小クラスのウェアラブルEEGデバイスです。
               日常生活の中で、あなたの内的状態を静かに、継続的に観測します。
             </p>
             <ul class="product-features" style="margin-bottom: 40px;">
-              <li><span class="feature-dot"></span><span>耳の後ろへの超小型装着設計</span></li>
+              <li><span class="feature-dot"></span><span>超小型設計</span></li>
               <li><span class="feature-dot"></span><span>ワイヤレスによる快適な装着感</span></li>
               <li><span class="feature-dot"></span><span>リアルタイム脳波計測</span></li>
               <li><span class="feature-dot"></span><span>アプリ・解析ソフトとの連携構想</span></li>
@@ -227,8 +284,8 @@
         <div class="feature-cards">
           <div class="feature-card reveal">
             <p class="feature-card-num">FEATURE 01</p>
-            <h3>超小型・耳後ろ装着</h3>
-            <p>これまでの脳波計は頭部全体に複数の電極を取り付ける必要がありました。HUSHは耳の後ろという一点に集約した超小型設計で、日常装着を実現します。</p>
+            <h3>超小型設計</h3>
+            <p>これまでの脳波計は頭部全体に複数の電極を取り付ける必要がありました。HUSHは耳という一点に集約した超小型設計で、日常装着を実現します。</p>
           </div>
           <div class="feature-card reveal delay-1">
             <p class="feature-card-num">FEATURE 02</p>
@@ -260,7 +317,7 @@
               </tr>
               <tr>
                 <th>装着部位</th>
-                <td>耳の後ろ（耳介後部）</td>
+                <td>耳</td>
               </tr>
               <tr>
                 <th>計測方式</th>

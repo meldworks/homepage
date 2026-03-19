@@ -3,13 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="株式会社メルドワークスへのお問い合わせ。製品・技術・採用・事業連携など、あらゆるご相談をお待ちしています。">
+
+  <!-- Security -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://hook.us2.make.com; img-src 'self' data: https://www.google-analytics.com; frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+
+  <!-- SEO -->
   <title>Contact | meldworks</title>
+  <meta name="description" content="株式会社メルドワークスへのお問い合わせ。製品・技術・採用・事業連携など、あらゆるご相談をお待ちしています。">
+  <meta name="keywords" content="メルドワークス,meldworks,お問い合わせ,採用,事業連携">
+  <link rel="canonical" href="https://meldworks.co.jp/pages/contact.html">
+  <meta name="robots" content="noindex, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="meldworks">
+  <meta property="og:title" content="Contact | meldworks">
+  <meta property="og:description" content="株式会社メルドワークスへのお問い合わせ。製品・技術・採用・事業連携など、あらゆるご相談をお待ちしています。">
+  <meta property="og:url" content="https://meldworks.co.jp/pages/contact.html">
+  <meta property="og:image" content="https://meldworks.co.jp/assets/ogp.png">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contact | meldworks">
+  <meta name="twitter:description" content="株式会社メルドワークスへのお問い合わせ。製品・技術・採用・事業連携など、あらゆるご相談をお待ちしています。">
+  <meta name="twitter:image" content="https://meldworks.co.jp/assets/ogp.png">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/animations.css">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-05HC1YK7ZW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-05HC1YK7ZW');
+  </script>
   <style>
     /* Contact ページ固有スタイル */
     .contact-section {
@@ -254,6 +290,11 @@
             </div>
 
             <form class="contact-form" id="contact-form" novalidate>
+              <!-- Honeypot: ボット対策（人間には非表示） -->
+              <div style="display:none;" aria-hidden="true">
+                <label for="website">ウェブサイト（入力しないでください）</label>
+                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+              </div>
               <div class="form-row">
                 <div class="form-group">
                   <label for="name">お名前 <span class="required">*</span></label>
@@ -356,6 +397,12 @@
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
+
+        // Honeypot check: ボットは非表示フィールドに入力する
+        const honeypot = form.querySelector('#website').value;
+        if (honeypot) {
+          return;
+        }
 
         const name     = form.querySelector('#name').value.trim();
         const company  = form.querySelector('#company').value.trim();

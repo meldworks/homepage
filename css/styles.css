@@ -846,6 +846,36 @@ button {
   background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 100%);
 }
 
+.research-visual {
+  background-image: url('../images/research-lab.jpg');
+  background-size: cover;
+  background-position: center center;
+}
+
+.research-visual::before {
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 100%);
+}
+
+.enterprise-visual {
+  background-image: url('../images/enterprise-factory.jpg');
+  background-size: cover;
+  background-position: center center;
+}
+
+.enterprise-visual::before {
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 100%);
+}
+
+.personal-visual {
+  background-image: url('../images/personal-wellness.jpg');
+  background-size: cover;
+  background-position: center center;
+}
+
+.personal-visual::before {
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 100%);
+}
+
 .visual-label {
   font-family: var(--font-en);
   font-size: 0.65rem;

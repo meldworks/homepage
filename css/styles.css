@@ -836,6 +836,16 @@ button {
   background: radial-gradient(ellipse at 30% 30%, var(--color-accent-glow) 0%, transparent 60%);
 }
 
+.sports-visual {
+  background-image: url('../images/sports-athletes.jpg');
+  background-size: cover;
+  background-position: center center;
+}
+
+.sports-visual::before {
+  background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 100%);
+}
+
 .visual-label {
   font-family: var(--font-en);
   font-size: 0.65rem;

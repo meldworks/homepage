@@ -7,7 +7,7 @@
 backend:
   name: github
   repo: meldworks/homepage
-  branch: main
+  branch: claude/meldworks-corporate-site-KpU0a
   base_url: https://decap-oauth.meldworks.workers.dev  # ← Cloudflare Worker のURL（SETUP.md参照）
   auth_endpoint: auth
 

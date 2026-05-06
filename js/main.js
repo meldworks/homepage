@@ -227,7 +227,7 @@
       this.maxLife = this.fadeIn + active + this.fadeOut;
 
       const angle = (25 + Math.random() * 15) * (Math.PI / 180);
-      this.vx = Math.cos(angle) * this.speed;
+      this.vx = -Math.cos(angle) * this.speed;   // マイナスで右→左へ
       this.vy = Math.sin(angle) * this.speed;
 
       this.x = Math.random() * W;
@@ -241,7 +241,7 @@
       this.x += this.vx * dt;
       this.y += this.vy * dt;
       this.age += dt;
-      if (this.age >= this.maxLife || this.y > docH + this.length || this.x > W + this.length) {
+      if (this.age >= this.maxLife || this.y > docH + this.length || this.x < -this.length) {
         this.reset();
       }
     }

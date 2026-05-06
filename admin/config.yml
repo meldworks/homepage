@@ -1,0 +1,109 @@
+# ====================================================================
+# Decap CMS 設定
+# 管理画面: https://meldworks.co.jp/admin/
+# 初期セットアップは admin/SETUP.md を参照
+# ====================================================================
+
+backend:
+  name: github
+  repo: meldworks/homepage
+  branch: main
+  base_url: https://decap-oauth.meldworks.workers.dev  # ← Cloudflare Worker のURL（SETUP.md参照）
+  auth_endpoint: auth
+
+# 公開先のドメイン（プレビューリンク用）
+site_url: https://meldworks.co.jp
+display_url: https://meldworks.co.jp
+logo_url: https://meldworks.co.jp/assets/logo.svg
+
+# 画像のアップロード先
+media_folder: images/news
+public_folder: /images/news
+
+# 編集中の下書き機能を有効化
+publish_mode: editorial_workflow
+
+# 日本語UI
+locale: ja
+
+# ====================================================================
+# Collections
+# ====================================================================
+collections:
+
+  # --------------------------------------------------------------
+  # お知らせ（ニュース） — 1ファイルにまとめて管理
+  # --------------------------------------------------------------
+  - name: news
+    label: お知らせ
+    label_singular: お知らせ
+    description: トップページと一覧ページに表示されるニュース記事です。
+    files:
+      - name: news_list
+        label: お知らせ一覧
+        file: news/news.json
+        format: json
+        fields:
+          - name: items
+            label: 記事一覧
+            label_singular: 記事
+            widget: list
+            summary: "{{fields.date}} | {{fields.title.ja}}"
+            fields:
+              - name: id
+                label: ID（スラッグ）
+                widget: string
+                hint: 半角英数とハイフン。例：2025-09-15-tsg-award
+                pattern: ['^[a-z0-9-]+$', '半角英数とハイフンのみ使用可']
+
+              - name: date
+                label: 公開日
+                widget: datetime
+                date_format: 'YYYY-MM-DD'
+                time_format: false
+                picker_utc: false
+
+              - name: category
+                label: カテゴリ
+                widget: select
+                default: news
+                options:
+                  - { label: 'お知らせ (NEWS)',     value: news }
+                  - { label: 'プレスリリース (PRESS)', value: press }
+                  - { label: 'イベント (EVENT)',    value: event }
+                  - { label: '製品 (PRODUCT)',     value: product }
+                  - { label: '採用 (CAREER)',      value: career }
+
+              - name: external_url
+                label: 外部リンク（任意）
+                widget: string
+                required: false
+                hint: メディア掲載などで外部記事に直接遷移させたい場合に入力。空欄なら本文ページが開きます。
+
+              - name: cover_image
+                label: カバー画像（任意）
+                widget: image
+                required: false
+                hint: 一覧ページ・本文ページの上部に表示されます。
+
+              - name: title
+                label: タイトル
+                widget: object
+                fields:
+                  - { name: ja, label: 日本語, widget: string }
+                  - { name: en, label: English, widget: string }
+
+              - name: summary
+                label: 概要
+                widget: object
+                fields:
+                  - { name: ja, label: 日本語, widget: text, hint: 一覧ページに2〜3行で表示 }
+                  - { name: en, label: English, widget: text }
+
+              - name: body
+                label: 本文（Markdown）
+                widget: object
+                hint: 外部リンクのみで本文が不要な場合は空欄でOK。
+                fields:
+                  - { name: ja, label: 日本語, widget: markdown, required: false }
+                  - { name: en, label: English, widget: markdown, required: false }

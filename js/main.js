@@ -196,6 +196,7 @@
 
 /* ============================================================
    流れ星 Canvas（全ページ共通・fixed背景）
+   ページ座標で星を管理し、スクロールに合わせて上下に動かす
    ============================================================ */
 (function initGlobalShootingStars() {
   const canvas = document.createElement('canvas');
@@ -204,9 +205,12 @@
   document.body.prepend(canvas);
 
   const ctx = canvas.getContext('2d');
-  let W, H, stars;
+  let W, H, stars = [];
+  let docH = 0;
 
-  const STAR_COUNT = 5;
+  // 1.0 = ページに完全アンカー（スクロールと同期）/ 0.5 = 半分の速度で追従（パララックス）
+  const PARALLAX = 1.0;
+  const STARS_PER_VIEWPORT = 5;
 
   class ShootingStar {
     constructor() { this.reset(true); }
@@ -227,7 +231,8 @@
       this.vy = Math.sin(angle) * this.speed;
 
       this.x = Math.random() * W;
-      this.y = Math.random() * H;
+      // y はページ全体の高さに分散（ビューポートに固定しない）
+      this.y = Math.random() * docH;
       this.age = init ? Math.random() * this.maxLife : 0;
     }
 
@@ -236,12 +241,17 @@
       this.x += this.vx * dt;
       this.y += this.vy * dt;
       this.age += dt;
-      if (this.age >= this.maxLife || this.x > W + this.length || this.y > H + this.length) {
+      if (this.age >= this.maxLife || this.y > docH + this.length || this.x > W + this.length) {
         this.reset();
       }
     }
 
     draw() {
+      // ページ座標 → 画面座標（スクロール量を引いて変換）
+      const drawY = this.y - window.scrollY * PARALLAX;
+      // 画面外はスキップ
+      if (drawY < -this.length - 20 || drawY > H + 20) return;
+
       let t;
       if (this.age < this.fadeIn) {
         t = this.age / this.fadeIn;
@@ -255,15 +265,15 @@
 
       const len = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
       const tx = this.x - (this.vx / len) * this.length;
-      const ty = this.y - (this.vy / len) * this.length;
+      const ty = drawY - (this.vy / len) * this.length;
 
-      const grad = ctx.createLinearGradient(tx, ty, this.x, this.y);
+      const grad = ctx.createLinearGradient(tx, ty, this.x, drawY);
       grad.addColorStop(0, `rgba(255,255,255,0)`);
       grad.addColorStop(1, `rgba(255,255,255,${a})`);
 
       ctx.beginPath();
       ctx.moveTo(tx, ty);
-      ctx.lineTo(this.x, this.y);
+      ctx.lineTo(this.x, drawY);
       ctx.strokeStyle = grad;
       ctx.lineWidth   = this.width;
       ctx.lineCap     = 'round';
@@ -274,6 +284,12 @@
   function resize() {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
+    docH = Math.max(document.documentElement.scrollHeight, H);
+
+    // ページが長いほど星の数を増やして密度を維持
+    const target = Math.max(5, Math.round(STARS_PER_VIEWPORT * docH / H));
+    while (stars.length < target) stars.push(new ShootingStar());
+    if (stars.length > target) stars.length = target;
   }
 
   let lastT = 0;
@@ -290,12 +306,18 @@
 
   function init() {
     resize();
-    stars = Array.from({ length: STAR_COUNT }, () => new ShootingStar());
     lastT = 0;
     requestAnimationFrame(loop);
   }
 
   window.addEventListener('resize', debounce(init, 200));
+
+  // ページの高さ変化（画像読み込み等）にも追従
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(debounce(resize, 200));
+    ro.observe(document.body);
+  }
+
   init();
 })();
 

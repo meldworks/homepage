@@ -2,7 +2,7 @@
   "items": [
     {
       "id": "2025-tsg-award",
-      "date": "2025-12-01",
+      "date": "2025-11-30",
       "category": "press",
       "external_url": "https://tsg.metro.tokyo.lg.jp/2025/winning2025",
       "cover_image": "",
@@ -21,7 +21,7 @@
     },
     {
       "id": "2025-fresh-faces",
-      "date": "2025-11-01",
+      "date": "2026-04-25",
       "category": "press",
       "external_url": "https://www.bs-asahi.co.jp/fresh-faces/lineup/prg_573/",
       "cover_image": "",
@@ -40,7 +40,7 @@
     },
     {
       "id": "2025-fit-lecture",
-      "date": "2025-10-01",
+      "date": "2025-12-17",
       "category": "event",
       "external_url": "https://www.fit.ac.jp/news/archives/5162",
       "cover_image": "",
@@ -59,7 +59,7 @@
     },
     {
       "id": "2025-yoake-pitch",
-      "date": "2025-09-01",
+      "date": "2026-02-24",
       "category": "event",
       "external_url": "https://www.optic.or.jp/event/event_detail/index/9295.html",
       "cover_image": "",
@@ -78,7 +78,7 @@
     },
     {
       "id": "2025-takeoff-pitch",
-      "date": "2025-08-01",
+      "date": "2026-03-26",
       "category": "event",
       "external_url": "https://workandrole.jp/pitch/9capital/",
       "cover_image": "",

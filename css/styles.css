@@ -329,6 +329,34 @@ button {
 }
 .nav-mobile a:hover { color: var(--color-white); }
 
+/* Language toggle */
+.nav-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-en);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  margin-left: 4px;
+}
+.nav-lang-btn {
+  color: var(--color-text-faint);
+  padding: 4px 6px;
+  transition: color var(--dur-fast);
+}
+.nav-lang-btn:hover { color: var(--color-white); }
+.nav-lang-btn.active {
+  color: var(--color-accent);
+}
+.nav-lang-sep {
+  color: var(--color-text-faint);
+  opacity: 0.5;
+}
+.nav-mobile .nav-lang {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
 /* ──────────────────────────────────────────────
    HERO SECTION
    ────────────────────────────────────────────── */

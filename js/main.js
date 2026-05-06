@@ -212,13 +212,14 @@
     constructor() { this.reset(true); }
 
     reset(init = false) {
-      this.speed   = 0.4 + Math.random() * 3.5;
+      // 遅めに偏らせて、突出して速い星が出ないようにする
+      this.speed   = 0.35 + Math.pow(Math.random(), 1.6) * 0.9; // 0.35 〜 1.25
       this.length  = 30  + Math.random() * 180;
       this.alpha   = 0.30 + Math.random() * 0.55;
       this.width   = 0.4 + Math.random() * 1.8;
-      this.fadeIn  = 4   + Math.random() * 20;
-      this.fadeOut = 15  + Math.random() * 60;
-      const active = 30  + Math.random() * 200;
+      this.fadeIn  = 8   + Math.random() * 24;
+      this.fadeOut = 20  + Math.random() * 70;
+      const active = 60  + Math.random() * 240;
       this.maxLife = this.fadeIn + active + this.fadeOut;
 
       const angle = (25 + Math.random() * 15) * (Math.PI / 180);
@@ -230,10 +231,11 @@
       this.age = init ? Math.random() * this.maxLife : 0;
     }
 
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      this.age++;
+    update(dt) {
+      // dt は「60fps相当のフレーム数」。タブ復帰や120Hz画面でも速度を一定化
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+      this.age += dt;
       if (this.age >= this.maxLife || this.x > W + this.length || this.y > H + this.length) {
         this.reset();
       }
@@ -274,16 +276,23 @@
     H = canvas.height = window.innerHeight;
   }
 
-  function loop() {
+  let lastT = 0;
+  function loop(now) {
+    // dt = 60fps基準のフレーム比。タブ復帰時の暴走を防ぐため最大2フレームで頭打ち
+    const elapsed = lastT ? now - lastT : 16.67;
+    const dt = Math.min(2, elapsed / 16.67);
+    lastT = now;
+
     ctx.clearRect(0, 0, W, H);
-    stars.forEach(s => { s.update(); s.draw(); });
+    stars.forEach(s => { s.update(dt); s.draw(); });
     requestAnimationFrame(loop);
   }
 
   function init() {
     resize();
     stars = Array.from({ length: STAR_COUNT }, () => new ShootingStar());
-    loop();
+    lastT = 0;
+    requestAnimationFrame(loop);
   }
 
   window.addEventListener('resize', debounce(init, 200));

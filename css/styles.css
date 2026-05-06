@@ -1133,6 +1133,256 @@ button {
 }
 
 /* ──────────────────────────────────────────────
+   NEWS — トップページ用 行リスト（控えめ）
+   ────────────────────────────────────────────── */
+.section-news {
+  padding: 100px 0;
+  background: var(--color-bg-alt);
+}
+.news-rows {
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+.news-row {
+  border-bottom: 1px solid var(--color-border);
+}
+.news-row-link {
+  display: grid;
+  grid-template-columns: 110px 110px 1fr;
+  gap: 24px;
+  align-items: center;
+  padding: 22px 4px;
+  color: var(--color-text);
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.news-row-link:hover {
+  background: var(--color-bg-card);
+  color: var(--color-white);
+}
+.news-row-date {
+  font-family: var(--font-en);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+.news-row-category {
+  font-family: var(--font-en);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+}
+.news-row-title {
+  font-size: 0.92rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+.news-cta {
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* ──────────────────────────────────────────────
+   NEWS — 一覧ページ カード
+   ────────────────────────────────────────────── */
+.news-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 40px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 16px;
+}
+.news-filter-btn {
+  font-family: var(--font-en);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  padding: 8px 18px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+}
+.news-filter-btn:hover {
+  color: var(--color-white);
+  border-color: var(--color-border-hov);
+}
+.news-filter-btn.active {
+  color: var(--color-accent);
+  border-color: var(--color-border-hov);
+  background: var(--color-accent-glow);
+}
+
+.news-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid var(--color-border);
+}
+.news-card {
+  border-bottom: 1px solid var(--color-border);
+}
+.news-card-link {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  align-items: stretch;
+  padding: 28px 4px;
+  color: var(--color-text);
+  transition: background var(--dur-fast);
+}
+.news-card-link:hover { background: var(--color-bg-card); }
+.news-cover {
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  background: var(--color-bg-card);
+}
+.news-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.news-card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+.news-card-link.no-cover {
+  grid-template-columns: 1fr;
+}
+.news-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.news-date {
+  font-family: var(--font-en);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+.news-category {
+  font-family: var(--font-en);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border-hov);
+  border-radius: 2px;
+}
+.news-title {
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--color-white);
+  line-height: 1.5;
+}
+.news-summary {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+}
+.ext-arrow {
+  font-size: 0.85em;
+  color: var(--color-accent);
+  margin-left: 4px;
+}
+
+.news-empty,
+.news-loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+/* ──────────────────────────────────────────────
+   NEWS — 詳細ページ
+   ────────────────────────────────────────────── */
+.news-detail {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 0 80px;
+}
+.news-detail .news-meta { margin-bottom: 24px; }
+.news-detail-title {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 300;
+  color: var(--color-white);
+  line-height: 1.4;
+  margin-bottom: 24px;
+}
+.news-detail-summary {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  line-height: 1.9;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 40px;
+}
+.news-detail-cover {
+  margin: 0 0 40px;
+}
+.news-detail-cover img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.news-body {
+  color: var(--color-text);
+  font-size: 0.95rem;
+  line-height: 2;
+}
+.news-body h2 {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--color-white);
+  margin: 48px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+.news-body h3 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--color-white);
+  margin: 32px 0 12px;
+}
+.news-body p { margin-bottom: 20px; }
+.news-body ul,
+.news-body ol { margin: 0 0 24px 1.4em; }
+.news-body li { margin-bottom: 8px; }
+.news-body a {
+  color: var(--color-accent);
+  border-bottom: 1px solid rgba(240, 112, 48, 0.3);
+  transition: border-color var(--dur-fast);
+}
+.news-body a:hover { border-color: var(--color-accent); }
+.news-body strong { color: var(--color-white); }
+.news-body img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 24px 0;
+}
+.news-body hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 40px 0;
+}
+.news-body code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--color-bg-card);
+  color: var(--color-accent);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* ──────────────────────────────────────────────
    RESPONSIVE
    ────────────────────────────────────────────── */
 @media (max-width: 900px) {
@@ -1148,6 +1398,8 @@ button {
   .footer-top { flex-direction: column; }
   .footer-nav ul { gap: 20px; }
 
+  .news-card-link { grid-template-columns: 1fr; }
+
   .pc-only { display: none; }
 }
 
@@ -1157,4 +1409,12 @@ button {
   .tab-btn { padding: 12px 16px; font-size: 0.8rem; }
   .footer-bottom { flex-direction: column; align-items: flex-start; }
   .company-table th { width: 120px; }
+
+  .news-row-link {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 18px 4px;
+  }
+  .news-row-title { font-size: 0.88rem; }
+  .news-meta { flex-wrap: wrap; gap: 12px; }
 }

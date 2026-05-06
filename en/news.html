@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Security -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com; img-src 'self' data: https://www.google-analytics.com; frame-ancestors 'none';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+
+  <!-- SEO -->
+  <title>News | meldworks</title>
+  <meta name="description" content="News, press releases and award announcements from meldworks Inc.">
+  <meta name="keywords" content="meldworks,news,press,announcements,awards">
+  <link rel="canonical" href="https://meldworks.co.jp/en/news.html">
+  <link rel="alternate" hreflang="ja" href="https://meldworks.co.jp/pages/news.html">
+  <link rel="alternate" hreflang="en" href="https://meldworks.co.jp/en/news.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="meldworks">
+  <meta property="og:title" content="News | meldworks">
+  <meta property="og:description" content="News, press releases and award announcements from meldworks Inc.">
+  <meta property="og:url" content="https://meldworks.co.jp/en/news.html">
+  <meta property="og:image" content="https://meldworks.co.jp/assets/ogp.png">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="News | meldworks">
+  <meta name="twitter:description" content="News, press releases and award announcements from meldworks Inc.">
+  <meta name="twitter:image" content="https://meldworks.co.jp/assets/ogp.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/animations.css">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-05HC1YK7ZW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-05HC1YK7ZW');
+  </script>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <header id="site-header" class="site-header scrolled">
+    <nav class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <img src="../assets/logo.svg" alt="meldworks logo" class="logo-img">
+        <span class="logo-text">meldworks</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="technology.html">Technology</a></li>
+        <li><a href="product.html">Product</a></li>
+        <li><a href="index.html#use-cases">Use Cases</a></li>
+        <li><a href="news.html" style="color: var(--color-accent);">News</a></li>
+        <li><a href="contact.html" class="nav-cta">Contact</a></li>
+        <li class="nav-lang" aria-label="Language">
+          <a href="../pages/news.html" class="nav-lang-btn">JP</a>
+          <span class="nav-lang-sep">/</span>
+          <a href="news.html" class="nav-lang-btn active">EN</a>
+        </li>
+      </ul>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+    <div class="nav-mobile" id="nav-mobile">
+      <ul>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="technology.html">Technology</a></li>
+        <li><a href="product.html">Product</a></li>
+        <li><a href="news.html">News</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-lang" aria-label="Language">
+          <a href="../pages/news.html" class="nav-lang-btn">JP</a>
+          <span class="nav-lang-sep">/</span>
+          <a href="news.html" class="nav-lang-btn active">EN</a>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+      <div class="container">
+        <span class="section-label">NEWS</span>
+        <h1>News</h1>
+      </div>
+    </section>
+
+    <!-- NEWS LIST -->
+    <section style="padding: 40px 0 120px;">
+      <div class="container">
+        <div data-news-list="all"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="site-footer" class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="../assets/logo.svg" alt="meldworks logo" class="footer-logo-img">
+            <span>meldworks</span>
+          </div>
+          <p class="footer-tagline">Know yourself, deeper.</p>
+        </div>
+        <nav class="footer-nav">
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="product.html">Product</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2024 meldworks. All rights reserved.</p>
+        <p class="footer-address">Tokyo, Japan</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="../js/news.js"></script>
+</body>
+</html>

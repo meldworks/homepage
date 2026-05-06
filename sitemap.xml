@@ -73,4 +73,20 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://meldworks.co.jp/pages/news.html</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meldworks.co.jp/pages/news.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://meldworks.co.jp/en/news.html"/>
+  </url>
+  <url>
+    <loc>https://meldworks.co.jp/en/news.html</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://meldworks.co.jp/pages/news.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://meldworks.co.jp/en/news.html"/>
+  </url>
 </urlset>

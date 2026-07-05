@@ -8,14 +8,13 @@
    ────────────────────────────────────────────── */
 .fade-in-up {
   opacity: 0;
-  transform: translateY(28px);
-  animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: translateY(24px);
+  animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.fade-in-up.delay-1 { animation-delay: 0.15s; }
-.fade-in-up.delay-2 { animation-delay: 0.3s; }
-.fade-in-up.delay-3 { animation-delay: 0.45s; }
-.fade-in-up.delay-4 { animation-delay: 0.6s; }
+.fade-in-up.delay-1 { animation-delay: 0.2s; }
+.fade-in-up.delay-2 { animation-delay: 0.4s; }
+.fade-in-up.delay-3 { animation-delay: 0.6s; }
 
 @keyframes fadeInUp {
   to {
@@ -25,33 +24,7 @@
 }
 
 /* ──────────────────────────────────────────────
-   ヒーロー見出し：1文字ずつのリビール
-   （JSが .split-chars 内を span.char に分割する）
-   ────────────────────────────────────────────── */
-.split-chars .word {
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.split-chars .char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(0.55em) rotate(4deg);
-  filter: blur(6px);
-  animation: charReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: calc(0.18s + var(--char-i, 0) * 0.035s);
-}
-
-@keyframes charReveal {
-  to {
-    opacity: 1;
-    transform: translateY(0) rotate(0deg);
-    filter: blur(0);
-  }
-}
-
-/* ──────────────────────────────────────────────
-   下線ホバー（リンク用）
+   オレンジ下線ホバー（リンク用）
    ────────────────────────────────────────────── */
 .underline-hover {
   position: relative;
@@ -78,10 +51,10 @@
    ────────────────────────────────────────────── */
 @keyframes accentPulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 122, 69, 0.45);
+    box-shadow: 0 0 0 0 rgba(240, 112, 48, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(255, 122, 69, 0);
+    box-shadow: 0 0 0 8px rgba(240, 112, 48, 0);
   }
 }
 
@@ -127,8 +100,8 @@
    グローイングボーダー（ホバー）
    ────────────────────────────────────────────── */
 @keyframes borderGlow {
-  0%, 100% { border-color: rgba(255, 122, 69, 0.2); }
-  50%       { border-color: rgba(255, 122, 69, 0.6); }
+  0%, 100% { border-color: rgba(240, 112, 48, 0.2); }
+  50%       { border-color: rgba(240, 112, 48, 0.6); }
 }
 
 /* ──────────────────────────────────────────────
@@ -151,11 +124,11 @@
 }
 
 .tab-panel.active {
-  animation: tabFadeIn 0.4s ease forwards;
+  animation: tabFadeIn 0.35s ease forwards;
 }
 
 @keyframes tabFadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -206,7 +179,7 @@ body {
   left: 0;
   width: 120px;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 60%, rgba(255,122,69,0.6) 100%);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 60%, rgba(240,112,48,0.6) 100%);
   border-radius: 1px;
   opacity: 0;
   animation: shootingStar var(--duration, 1.2s) var(--delay, 0s) linear forwards;
@@ -227,23 +200,5 @@ body {
   100% {
     opacity: 0;
     transform: translate(calc(var(--start-x) + var(--travel-x)), calc(var(--start-y) + var(--travel-y))) rotate(var(--angle)) scaleX(1);
-  }
-}
-
-/* ──────────────────────────────────────────────
-   REDUCED MOTION
-   ────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .fade-in-up,
-  .split-chars .char,
-  .pulse-dot,
-  .floating,
-  .shooting-star,
-  .site-header,
-  body {
-    animation: none !important;
-    opacity: 1;
-    transform: none;
-    filter: none;
   }
 }

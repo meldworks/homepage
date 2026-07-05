@@ -60,7 +60,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/styles.css">
@@ -124,7 +124,80 @@
   <main>
 
     <!-- =============================
-         NEWS SECTION（控えめに最上部）
+         HERO SECTION
+    ============================== -->
+    <section id="hero" class="section-hero">
+      <!-- 背景：EEG波形Canvas＋オーロラ＋グリッド -->
+      <div class="hero-bg" aria-hidden="true">
+        <canvas id="hero-canvas" class="hero-canvas"></canvas>
+        <div class="hero-aurora hero-aurora--1"></div>
+        <div class="hero-aurora hero-aurora--2"></div>
+        <div class="hero-grid"></div>
+      </div>
+
+      <div class="container hero-inner">
+        <div class="hero-content">
+          <p class="hero-eyebrow fade-in-up"><span class="eyebrow-dot pulse-dot"></span>WEARABLE EEG — HUSH</p>
+          <h1 class="hero-headline split-chars">
+            <span class="nowrap">感覚に頼る時代は</span><br>
+            <span class="grad nowrap">終わる。</span>
+          </h1>
+          <p class="hero-subline fade-in-up delay-2">
+            超小型ウェアラブル脳波計 <strong>HUSH</strong> で、<br class="pc-only">
+            あなたの状態を、より深く理解する時代が始まります。
+          </p>
+          <div class="hero-actions fade-in-up delay-3">
+            <a href="#product" class="btn-primary">製品を見る</a>
+            <a href="#about" class="btn-ghost">会社について</a>
+          </div>
+        </div>
+
+        <!-- ライブシグナルパネル（デモ演出） -->
+        <div class="hero-signal fade-in-up delay-3" aria-hidden="true">
+          <div class="signal-head">
+            <span class="signal-dot"></span>
+            <span class="signal-title">LIVE SIGNAL</span>
+            <span class="signal-tag">SIMULATION</span>
+          </div>
+          <canvas id="signal-canvas" class="signal-canvas"></canvas>
+          <div class="signal-metrics">
+            <div class="signal-metric" data-metric="focus">
+              <div class="metric-row">
+                <span class="metric-name">FOCUS ── 集中</span>
+                <span class="metric-value">64<em>%</em></span>
+              </div>
+              <div class="metric-bar"><span class="metric-fill"></span></div>
+            </div>
+            <div class="signal-metric" data-metric="calm">
+              <div class="metric-row">
+                <span class="metric-name">CALM ── リラックス</span>
+                <span class="metric-value">58<em>%</em></span>
+              </div>
+              <div class="metric-bar"><span class="metric-fill"></span></div>
+            </div>
+            <div class="signal-metric" data-metric="alert">
+              <div class="metric-row">
+                <span class="metric-name">ALERT ── 覚醒</span>
+                <span class="metric-value">71<em>%</em></span>
+              </div>
+              <div class="metric-bar"><span class="metric-fill"></span></div>
+            </div>
+          </div>
+          <div class="signal-foot">
+            <span>HUSH — WEARABLE EEG</span>
+            <span>δ θ α β γ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-scroll-indicator">
+        <span class="scroll-line"></span>
+        <span class="scroll-label">SCROLL</span>
+      </div>
+    </section>
+
+    <!-- =============================
+         NEWS SECTION（ヒーロー直下・控えめ）
     ============================== -->
     <section id="news" class="section-news section-news--top">
       <div class="container">
@@ -137,32 +210,20 @@
     </section>
 
     <!-- =============================
-         HERO SECTION
+         MARQUEE（帯）
     ============================== -->
-    <section id="hero" class="section-hero">
-      <!-- Canvas for particle animation -->
-      <canvas id="hero-canvas" class="hero-canvas"></canvas>
-
-      <div class="hero-content">
-        <p class="hero-eyebrow fade-in-up">WEARABLE EEG</p>
-        <h1 class="hero-headline fade-in-up delay-1">
-          感覚に頼る時代は終わる。
-        </h1>
-        <p class="hero-subline fade-in-up delay-2">
-          超小型ウェアラブル脳波計 <strong>HUSH</strong> で、<br class="pc-only">
-          あなたの状態を、より深く理解する時代が始まります。
-        </p>
-        <div class="hero-actions fade-in-up delay-3">
-          <a href="#product" class="btn-primary">製品を見る</a>
-          <a href="#about" class="btn-ghost">会社について</a>
-        </div>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>WEARABLE EEG</span><span class="marquee-dot"></span>
+        <span class="marquee-accent">HUSH</span><span class="marquee-dot"></span>
+        <span>BRAIN DATA, EVERYDAY</span><span class="marquee-dot"></span>
+        <span>FROM SIGNAL TO ACTION</span><span class="marquee-dot"></span>
+        <span>WEARABLE EEG</span><span class="marquee-dot"></span>
+        <span class="marquee-accent">HUSH</span><span class="marquee-dot"></span>
+        <span>BRAIN DATA, EVERYDAY</span><span class="marquee-dot"></span>
+        <span>FROM SIGNAL TO ACTION</span><span class="marquee-dot"></span>
       </div>
-
-      <div class="hero-scroll-indicator">
-        <span class="scroll-line"></span>
-        <span class="scroll-label">SCROLL</span>
-      </div>
-    </section>
+    </div>
 
     <!-- =============================
          MESSAGE SECTION
@@ -172,7 +233,7 @@
         <div class="message-inner reveal">
           <p class="message-label">OUR MISSION</p>
           <h2 class="message-headline">
-            まだ知らない自分を知る。
+            まだ知らない自分を、<span class="grad">知る。</span>
           </h2>
           <p class="message-body">
             心拍、睡眠、活動量——現代のウェアラブルデバイスは、身体の多くを可視化しました。<br>
@@ -287,7 +348,13 @@
           <!-- Product visual placeholder -->
           <div class="product-visual">
             <div class="product-glow"></div>
-            <span class="device-label">Coming Soon...</span>
+            <div class="orbit orbit--1"></div>
+            <div class="orbit orbit--2"></div>
+            <div class="orbit orbit--3"></div>
+            <div class="device-core">
+              <span class="device-label">HUSH</span>
+              <span class="device-sub">COMING SOON</span>
+            </div>
             <div class="device-wave">
               <svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path class="wave-path" d="M0 30 Q25 10 50 30 Q75 50 100 30 Q125 10 150 30 Q175 50 200 30" stroke="currentColor" stroke-width="1.5" fill="none"/>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>meldworks — B案プロトタイプ「白い静けさ」</title>
+  <meta name="robots" content="noindex">
+
+  <!--
+    ============================================================
+    デザインプロトタイプ（B案：白い静けさ × 一本の線）
+    ファーストビューの世界観確認用。本実装ではありません。
+    ============================================================
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper:      #f7f4ee;   /* 生成りの紙 */
+      --sumi:       #221f1a;   /* 墨 */
+      --sumi-soft:  #6e695e;   /* 薄墨 */
+      --sumi-faint: #a09a8c;   /* さらに薄く */
+      --line:       #c4beae;   /* 線の基本色（淡い灰） */
+      --hi:         #e2561f;   /* シグナルオレンジ（一点のみ） */
+
+      --mincho: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      --sans:   'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      --en:     'Inter', sans-serif;
+
+      --ease-quiet: cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--sumi);
+      font-family: var(--sans);
+      font-weight: 400;
+      line-height: 2;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── 紙の質感（ごく薄いノイズ） ── */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.13 0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── 一本の線（fixed・ページを通して生き続ける） ── */
+    #line-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── ヘッダー ── */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 34px clamp(24px, 4.5vw, 64px) 0;
+      opacity: 0;
+      animation: quietFade 1.6s var(--ease-quiet) 1.5s forwards;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--sumi);
+    }
+    .brand svg { width: 26px; height: 26px; display: block; }
+    .brand span {
+      font-family: var(--en);
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 2.6vw, 38px);
+      font-family: var(--en);
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      color: var(--sumi-soft);
+    }
+    .nav a { transition: color 0.4s; }
+    .nav a:hover { color: var(--sumi); }
+    .nav .lang { color: var(--sumi-faint); }
+    .nav .lang b { color: var(--sumi); font-weight: 500; }
+
+    /* ── ヒーロー ── */
+    .hero {
+      position: relative;
+      z-index: 2;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-inner {
+      transform: translateY(-6vh);
+      padding: 0 clamp(24px, 5vw, 64px);
+    }
+
+    .headline {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(2.1rem, 5.2vw, 4.1rem);
+      line-height: 1.7;
+      letter-spacing: 0.07em;
+      color: var(--sumi);
+    }
+
+    /* 行ごとのマスクリビール */
+    .hl-line {
+      display: block;
+      overflow: hidden;
+      padding-bottom: 0.12em;   /* 「、」などの見切れ防止 */
+      margin-bottom: -0.12em;
+    }
+    .hl-line > span {
+      display: block;
+      transform: translateY(112%);
+      animation: rise 1.5s var(--ease-quiet) forwards;
+    }
+    .hl-line:nth-child(1) > span { animation-delay: 0.5s; }
+    .hl-line:nth-child(2) > span { animation-delay: 0.72s; }
+    .hl-line--indent { padding-left: 2em; }
+
+    @keyframes rise {
+      to { transform: translateY(0); }
+    }
+
+    .subcopy {
+      margin-top: 44px;
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 1.35s forwards;
+    }
+
+    @keyframes quietFade {
+      to { opacity: 1; }
+    }
+
+    /* ── 縦書きラベル（左） ── */
+    /* 縦書き風ラベル：Webフォントの縦書きメトリクスに依存しないよう
+       1文字ずつブロックで積む */
+    .side-label {
+      position: fixed;
+      left: clamp(22px, 3.6vw, 52px);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--mincho);
+      font-size: 0.72rem;
+      line-height: 1;
+      color: var(--sumi-faint);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 1.8s forwards;
+    }
+    .side-label .ch {
+      display: block;
+      margin-bottom: 0.62em;
+    }
+    .side-label .ch.en {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0;
+      margin-bottom: 0.7em;
+    }
+    .side-label .sep {
+      display: block;
+      width: 1px;
+      height: 26px;
+      margin: 10px 0 16px;
+      background: currentColor;
+      opacity: 0.55;
+    }
+
+    /* ── 下部の小さな要素 ── */
+    .foot {
+      position: fixed;
+      bottom: 34px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 clamp(24px, 4.5vw, 64px);
+      pointer-events: none;
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 2s forwards;
+    }
+
+    .scroll-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.34em;
+      color: var(--sumi-faint);
+    }
+    .scroll-hint i {
+      display: block;
+      width: 1px;
+      height: 44px;
+      background: var(--sumi-faint);
+      transform-origin: top;
+      animation: hintLine 2.8s var(--ease-quiet) infinite;
+    }
+    @keyframes hintLine {
+      0%   { transform: scaleY(0); }
+      45%  { transform: scaleY(1); transform-origin: top; }
+      46%  { transform-origin: bottom; }
+      90%, 100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    .foot-tag {
+      font-family: var(--mincho);
+      font-size: 0.72rem;
+      letter-spacing: 0.24em;
+      color: var(--sumi-faint);
+    }
+
+    /* ── 2画面目（線の連続性デモ） ── */
+    .passage {
+      position: relative;
+      z-index: 2;
+      min-height: 130svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 clamp(24px, 5vw, 64px);
+    }
+
+    .passage-inner {
+      max-width: 640px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 1.6s var(--ease-quiet), transform 1.6s var(--ease-quiet);
+    }
+    .passage-inner.visible { opacity: 1; transform: translateY(0); }
+
+    .passage h2 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      line-height: 2.2;
+      letter-spacing: 0.09em;
+      margin-bottom: 36px;
+    }
+
+    .passage p {
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      line-height: 2.4;
+      color: var(--sumi-soft);
+    }
+
+    .passage .en-label {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: var(--sumi-faint);
+      margin-bottom: 28px;
+    }
+
+    /* ── レスポンシブ ── */
+    @media (max-width: 720px) {
+      .nav { display: none; }
+      .side-label { display: none; }
+      .headline { line-height: 1.85; }
+      .hl-line--indent { padding-left: 1em; }
+      .foot { padding: 0 24px; }
+      .foot-tag { display: none; }
+      .hero-inner { transform: translateY(-4vh); }
+    }
+
+    /* ── reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      .header, .subcopy, .side-label, .foot { animation: none; opacity: 1; }
+      .hl-line > span { animation: none; transform: none; }
+      .scroll-hint i { animation: none; transform: scaleY(1); }
+      .passage-inner { transition: none; opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="line-canvas" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="header">
+    <a class="brand" href="#">
+      <!-- ロゴ（墨色版） -->
+      <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="meldworks logo">
+        <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="14"/>
+        <circle cx="162" cy="170" r="10" fill="currentColor"/>
+        <circle cx="143" cy="285" r="24" fill="currentColor"/>
+        <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+        <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+        <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+      </svg>
+      <span>meldworks</span>
+    </a>
+    <nav class="nav">
+      <a href="#">About</a>
+      <a href="#">Technology</a>
+      <a href="#">Product</a>
+      <a href="#">News</a>
+      <a href="#">Contact</a>
+      <span class="lang"><b>JP</b> / EN</span>
+    </nav>
+  </header>
+
+  <p class="side-label" aria-label="ウェアラブル脳波計 HUSH"><span class="ch">ウ</span><span class="ch">ェ</span><span class="ch">ア</span><span class="ch">ラ</span><span class="ch">ブ</span><span class="ch">ル</span><span class="ch">脳</span><span class="ch">波</span><span class="ch">計</span><span class="sep" aria-hidden="true"></span><span class="ch en">H</span><span class="ch en">U</span><span class="ch en">S</span><span class="ch en">H</span></p>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <h1 class="headline">
+          <span class="hl-line"><span>感覚に頼る時代は、</span></span>
+          <span class="hl-line hl-line--indent"><span>終わる。</span></span>
+        </h1>
+        <p class="subcopy">
+          脳波を、日常のデータに。<br>
+          イヤホンのように装着するだけの、超小型ウェアラブル脳波計。
+        </p>
+      </div>
+    </section>
+
+    <section class="passage">
+      <div class="passage-inner" id="passage">
+        <span class="en-label">WHY BRAINWAVE</span>
+        <h2>
+          心拍や睡眠のように、<br>
+          脳の状態が、日常の言葉になる。
+        </h2>
+        <p>
+          集中、疲労、リラックス、覚醒——<br>
+          いままで感覚でしか語れなかったものを、静かな一本の信号が教えてくれる。
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div class="foot">
+    <div class="scroll-hint"><i></i><span>SCROLL</span></div>
+    <p class="foot-tag">まだ知らない自分を知る。</p>
+  </div>
+
+  <script>
+    /* ============================================================
+       一本の線：
+       ・普段は凪いだ細い線として画面を横切る
+       ・スクロール速度に反応して波打ち、わずかに色が温まる
+       ・小さなオレンジの点がひとつ、線の上を漂う
+       ============================================================ */
+    (function () {
+      const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const canvas = document.getElementById('line-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let W, H, dpr;
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // 線の形：長い波長のサインを重ねる（脳波の「凪」）
+      function wave(x, t) {
+        return Math.sin(x * 0.0036 + t * 0.6) * 0.5
+             + Math.sin(x * 0.0082 - t * 0.38) * 0.3
+             + Math.sin(x * 0.0158 + t * 0.9) * 0.2;
+      }
+
+      // 色の補間（淡灰 → オレンジ）
+      const C0 = [196, 190, 174];
+      const C1 = [226, 86, 31];
+      function lerpColor(k) {
+        const r = Math.round(C0[0] + (C1[0] - C0[0]) * k);
+        const g = Math.round(C0[1] + (C1[1] - C0[1]) * k);
+        const b = Math.round(C0[2] + (C1[2] - C0[2]) * k);
+        return `rgb(${r},${g},${b})`;
+      }
+
+      // スクロール速度の追跡
+      let lastY = window.scrollY;
+      let vel = 0;
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        vel = Math.min(60, vel + Math.abs(y - lastY) * 0.22);
+        lastY = y;
+      }, { passive: true });
+
+      let amp = 0;          // 現在の振幅
+      let warm = 0;         // 0..1 色の温まり
+      let progress = 0;     // 線の描画進行（登場演出）
+      const startTime = performance.now();
+
+      function frame(now) {
+        const t = now * 0.001;
+
+        // 登場：線が左から右へ静かに引かれる（0.3s〜1.9s）
+        const el = (now - startTime - 300) / 1600;
+        progress = REDUCED ? 1 : Math.max(0, Math.min(1, el));
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        // 速度は減衰し、振幅と色へゆっくり伝わる
+        vel *= 0.93;
+        const targetAmp = REDUCED ? 6 : Math.min(46, 6 + vel * 1.1);
+        amp += (targetAmp - amp) * 0.055;
+        const targetWarm = REDUCED ? 0 : Math.min(1, vel / 46);
+        warm += (targetWarm - warm) * 0.045;
+
+        ctx.clearRect(0, 0, W, H);
+
+        const baseY = H * 0.66;
+        const endX = W * eased;
+
+        // 線
+        ctx.beginPath();
+        for (let x = 0; x <= endX; x += 4) {
+          const y = baseY + wave(x, t) * amp;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = lerpColor(warm * 0.8);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // オレンジの点：線の上をとてもゆっくり漂う
+        if (eased > 0.98) {
+          const dx = W * (0.5 + 0.36 * Math.sin(t * 0.07));
+          const dy = baseY + wave(dx, t) * amp;
+          ctx.beginPath();
+          ctx.arc(dx, dy, 3, 0, Math.PI * 2);
+          ctx.fillStyle = '#e2561f';
+          ctx.fill();
+        }
+
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    /* 2画面目のリビール */
+    (function () {
+      const el = document.getElementById('passage');
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.3 });
+      io.observe(el);
+    })();
+  </script>
+</body>
+</html>

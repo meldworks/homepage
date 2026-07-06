@@ -337,7 +337,7 @@
     .mission {
       position: relative;
       z-index: 2;
-      height: 300vh;               /* スクロールの長さ＝演出の長さ */
+      height: 220vh;               /* スクロールの長さ＝演出の長さ */
     }
     .mission-pin {
       position: sticky;
@@ -350,6 +350,7 @@
     .mission-body {
       max-width: 780px;
       padding: 0 var(--pad-x);
+      will-change: transform;
     }
     .mission .en-label { text-align: center; }
     .fill-text {
@@ -476,17 +477,22 @@
     .product {
       position: relative;
       z-index: 2;
-      height: 300vh;
+      height: 260vh;
     }
     .product-pin {
       position: sticky;
       top: 0;
       height: 100svh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+    }
+    .product-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      will-change: transform;
     }
     .product-word {
       font-family: var(--en);
@@ -648,7 +654,7 @@
     .vision {
       position: relative;
       z-index: 2;
-      height: 240vh;
+      height: 180vh;
     }
     .vision-pin {
       position: sticky;
@@ -659,7 +665,7 @@
       justify-content: center;
       text-align: center;
     }
-    .vision-body { max-width: 720px; padding: 0 var(--pad-x); }
+    .vision-body { max-width: 720px; padding: 0 var(--pad-x); will-change: transform; }
     .vision-body .en-label { text-align: center; }
     .vision-title {
       font-family: var(--mincho);
@@ -806,8 +812,8 @@
       .tech-grid { grid-template-columns: 1fr; }
       .case-grid { grid-template-columns: 1fr; }
       .company-table th { width: 110px; }
-      .mission { height: 260vh; }
-      .product { height: 260vh; }
+      .mission { height: 200vh; }
+      .product { height: 230vh; }
     }
 
     /* ============================================================
@@ -900,7 +906,7 @@
     <!-- 3. MISSION：スクロールで文字が満ちる -->
     <section class="mission" id="mission">
       <div class="mission-pin">
-        <div class="mission-body">
+        <div class="mission-body" id="mission-body">
           <span class="en-label" style="text-align:center; display:block;">OUR MISSION</span>
           <p class="fill-text" id="fill-text">心拍、睡眠、活動量。からだの多くは、もう見えるようになった。けれど脳の状態だけが、まだ感覚のなかに取り残されている。私たちは脳波をあたりまえの日常データに変え、人が<em>まだ知らない自分</em>と出会える社会をつくる。</p>
         </div>
@@ -981,9 +987,11 @@
     <!-- 6. PRODUCT：波が凪いで HUSH -->
     <section class="product" id="product">
       <div class="product-pin">
-        <div class="product-word" id="product-word">HUSH</div>
-        <p class="product-caption" id="product-caption">騒がしい信号が、静けさに変わる。</p>
-        <p class="product-sub" id="product-sub">ウェアラブル脳波計 ── COMING SOON</p>
+        <div class="product-stage" id="product-stage">
+          <div class="product-word" id="product-word">HUSH</div>
+          <p class="product-caption" id="product-caption">騒がしい信号が、静けさに変わる。</p>
+          <p class="product-sub" id="product-sub">ウェアラブル脳波計 ── COMING SOON</p>
+        </div>
       </div>
     </section>
 
@@ -1074,7 +1082,7 @@
     <!-- 9. VISION -->
     <section class="vision" id="vision">
       <div class="vision-pin">
-        <div class="vision-body">
+        <div class="vision-body" id="vision-body">
           <span class="en-label" style="display:block;">VISION</span>
           <h2 class="vision-title" id="vision-title">
             自分の状態を知ることが、<br>
@@ -1171,11 +1179,12 @@
 
     /* ============================================================
        1. 一本の線（背景 Canvas）
-       ・スクロール速度で波打つ（ヒーローの体験）
-       ・製品シーンでは進行度に応じて凪いでいく
-       ・ビジョンシーンでは薄れて地平線になる
+       意味のある場面だけに現れる：
+       ・ヒーロー：スクロール速度で波打つ（線との出会い）
+       ・製品シーン：波打ちながら現れ、進行度に応じて凪いでいく
+       ・それ以外の場所ではフェードアウトして消える
        ============================================================ */
-    const lineState = { calm: 0, fade: 0 };   // シーン側から毎フレーム更新
+    const lineState = { calm: 0, alpha: 1, extraAmp: 0 };   // シーン側から毎フレーム更新
 
     (function () {
       const canvas = document.getElementById('line-canvas');
@@ -1212,7 +1221,7 @@
         lastY = y;
       }, { passive: true });
 
-      let amp = 0, warm = 0;
+      let amp = 0, warm = 0, alpha = 1;
       const startTime = performance.now();
 
       function frame(now) {
@@ -1224,13 +1233,15 @@
 
         vel *= 0.93;
         const calm = lineState.calm;                    // 0=通常 1=完全に凪
-        const targetAmp = REDUCED ? 4 : (6 + vel * 1.1) * (1 - calm);
+        const targetAmp = REDUCED ? 4 : (6 + vel * 1.1 + lineState.extraAmp) * (1 - calm);
         amp += (targetAmp - amp) * 0.055;
         const targetWarm = REDUCED ? 0 : Math.min(1, vel / 46) * (1 - calm);
         warm += (targetWarm - warm) * 0.045;
+        alpha += (lineState.alpha - alpha) * 0.08;      // 出入りは常にゆっくり
 
         ctx.clearRect(0, 0, W, H);
-        ctx.globalAlpha = 1 - lineState.fade * 0.82;
+        if (alpha < 0.015) { requestAnimationFrame(frame); return; }
+        ctx.globalAlpha = alpha;
 
         const baseY = H * 0.66;
         const endX = W * eased;
@@ -1290,8 +1301,8 @@
 
       let litCount = -1;
       window.__updateMission = function (p) {
-        // 進行度 0.1〜0.9 の間で全文字が満ちる
-        const k = clamp01((p - 0.08) / 0.78);
+        // 入った瞬間から満ち始める（先頭に「何も起きない区間」を作らない）
+        const k = clamp01((p - 0.02) / 0.82);
         const n = Math.round(k * chars.length);
         if (n === litCount) return;
         litCount = n;
@@ -1306,16 +1317,26 @@
        3. メインループ：各シーンの進行度を計算して適用
        ============================================================ */
     (function () {
-      if (REDUCED) return;
+      if (REDUCED) {
+        // 動きは付けないが、線はヒーロー以外では出さない
+        const onScroll = () => {
+          lineState.alpha = window.scrollY < window.innerHeight * 0.8 ? 1 : 0;
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        return;
+      }
 
       const heroInner   = document.getElementById('hero-inner');
-      const hero        = document.getElementById('hero');
       const mission     = document.getElementById('mission');
+      const missionBody = document.getElementById('mission-body');
       const product     = document.getElementById('product');
+      const pStage      = document.getElementById('product-stage');
       const pWord       = document.getElementById('product-word');
       const pCaption    = document.getElementById('product-caption');
       const pSub        = document.getElementById('product-sub');
       const vision      = document.getElementById('vision');
+      const vBody       = document.getElementById('vision-body');
       const vTitle      = document.getElementById('vision-title');
       const vText       = document.getElementById('vision-text');
       const header      = document.getElementById('header');
@@ -1332,18 +1353,29 @@
         heroInner.style.transform = `translateY(${-6 - hp * 8}vh)`;
         heroInner.style.opacity = String(1 - hp * 1.15);
 
-        /* ミッション：文字が満ちる */
-        if (window.__updateMission) window.__updateMission(pinProgress(mission));
+        /* ミッション：文字が満ちる＋本文がゆっくり上昇し続ける
+           （ピン留め中も「スクロールが効いている」ことが見えるように） */
+        const mp = pinProgress(mission);
+        if (window.__updateMission) window.__updateMission(mp);
+        missionBody.style.transform = `translateY(${lerp(7, -7, mp)}vh)`;
 
-        /* 製品：波が凪ぎ、HUSH が浮かび上がる */
+        /* 製品：線が波打ちながら現れ、凪ぎ、HUSH が浮かび上がる */
         const pp = pinProgress(product);
+        const inProduct = pp > 0 && pp < 1;
+        //   0.0-0.12 : 線がフェードイン（波打った状態で）
         //   0.0-0.55 : 線が凪いでいく
         //   0.15-0.6 : HUSH がにじみ出て字間が締まる
-        //   0.5-0.75 : キャプション
-        //   0.65-0.85: サブ
+        //   0.5-0.75 : キャプション、0.65-0.85: サブ
         const calmK = clamp01(pp / 0.55);
-        const inProduct = pp > 0 && pp < 1;
         lineState.calm = inProduct ? calmK : 0;
+        const productIn = clamp01(pp / 0.12) * (1 - clamp01((pp - 0.88) / 0.12));
+        lineState.extraAmp = inProduct ? 26 * productIn : 0;
+
+        /* 線の可視状態：ヒーローと製品シーンのみ */
+        const heroVis = 1 - clamp01((y - vh * 0.1) / (vh * 0.75));
+        lineState.alpha = Math.max(heroVis, inProduct ? productIn : 0);
+
+        pStage.style.transform = `translateY(${lerp(4, -4, pp)}vh)`;
 
         const wordK = clamp01((pp - 0.15) / 0.45);
         const we = 1 - Math.pow(1 - wordK, 3);
@@ -1359,10 +1391,9 @@
         const subK = clamp01((pp - 0.65) / 0.2);
         pSub.style.opacity = String(subK);
 
-        /* ビジョン：線がほどけて地平線に、文がゆっくり現れて留まる */
+        /* ビジョン：文がゆっくり現れ、全体は上昇し続ける（線は出さない） */
         const vp = pinProgress(vision);
-        const inVision = vp > 0 && vp < 1;
-        lineState.fade = inVision ? clamp01(vp / 0.5) : 0;
+        vBody.style.transform = `translateY(${lerp(5, -5, vp)}vh)`;
 
         const vtK = clamp01((vp - 0.05) / 0.3);
         vTitle.style.opacity = String(vtK);

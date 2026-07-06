@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>meldworks — B案プロトタイプ（トップページ全体・スクロール演出版）</title>
+  <meta name="robots" content="noindex">
+
+  <!--
+    ============================================================
+    デザインプロトタイプ（B案：白い静けさ × 一本の線）
+    トップページ全体＋スクロール駆動アニメーション版。
+    本実装ではありません。ニュースはダミーの静的表示です。
+    ============================================================
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper:      #f7f4ee;
+      --paper-deep: #efeadf;   /* わずかに濃い紙（セクション差） */
+      --sumi:       #221f1a;
+      --sumi-soft:  #6e695e;
+      --sumi-faint: #a09a8c;
+      --ghost:      #d8d2c4;   /* 満ちる前の文字色 */
+      --line:       #c4beae;
+      --hi:         #e2561f;
+
+      --mincho: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      --sans:   'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      --en:     'Inter', sans-serif;
+
+      --ease-quiet: cubic-bezier(0.19, 1, 0.22, 1);
+      --pad-x: clamp(24px, 5vw, 72px);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--paper);
+      color: var(--sumi);
+      font-family: var(--sans);
+      font-weight: 400;
+      line-height: 2;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+
+    ::selection { background: rgba(226, 86, 31, 0.18); }
+
+    /* ── 紙の質感 ── */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.13 0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ── 一本の線 ── */
+    #line-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── ヘッダー ── */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px var(--pad-x) 22px;
+      opacity: 0;
+      animation: quietFade 1.6s var(--ease-quiet) 1.5s forwards;
+      transition: background 0.6s, box-shadow 0.6s;
+    }
+    .header.solid {
+      background: rgba(247, 244, 238, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--sumi); }
+    .brand svg { width: 26px; height: 26px; display: block; }
+    .brand span {
+      font-family: var(--en);
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 2.6vw, 38px);
+      font-family: var(--en);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--sumi-soft);
+    }
+    .nav a { transition: color 0.4s; }
+    .nav a:hover { color: var(--sumi); }
+    .nav .lang { color: var(--sumi-faint); }
+    .nav .lang b { color: var(--sumi); font-weight: 500; }
+
+    /* ── 縦書きラベル ── */
+    .side-label {
+      position: fixed;
+      left: clamp(22px, 3.6vw, 52px);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--mincho);
+      font-size: 0.72rem;
+      line-height: 1;
+      color: var(--sumi-faint);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 1.8s forwards;
+    }
+    .side-label .ch { display: block; margin-bottom: 0.62em; }
+    .side-label .ch.en {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      margin-bottom: 0.7em;
+    }
+    .side-label .sep {
+      display: block;
+      width: 1px; height: 26px;
+      margin: 10px 0 16px;
+      background: currentColor;
+      opacity: 0.55;
+    }
+
+    /* ============================================================
+       共通パーツ
+       ============================================================ */
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 var(--pad-x);
+      position: relative;
+      z-index: 2;
+    }
+
+    .en-label {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      font-weight: 400;
+      letter-spacing: 0.42em;
+      color: var(--sumi-faint);
+      margin-bottom: 30px;
+    }
+
+    .sec-title {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.55rem, 3.2vw, 2.3rem);
+      line-height: 1.9;
+      letter-spacing: 0.08em;
+      margin-bottom: 40px;
+    }
+
+    /* IOでの静かなリビール */
+    .rv {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1.4s var(--ease-quiet), transform 1.4s var(--ease-quiet);
+    }
+    .rv.on { opacity: 1; transform: translateY(0); }
+    .rv.d1 { transition-delay: 0.12s; }
+    .rv.d2 { transition-delay: 0.24s; }
+    .rv.d3 { transition-delay: 0.36s; }
+
+    @keyframes quietFade { to { opacity: 1; } }
+
+    /* ============================================================
+       1. HERO
+       ============================================================ */
+    .hero {
+      position: relative;
+      z-index: 2;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-inner {
+      transform: translateY(-6vh);
+      padding: 0 var(--pad-x);
+      will-change: transform, opacity;
+    }
+
+    .headline {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(2.1rem, 5.2vw, 4.1rem);
+      line-height: 1.7;
+      letter-spacing: 0.07em;
+    }
+    .hl-line {
+      display: block;
+      overflow: hidden;
+      padding-bottom: 0.12em;
+      margin-bottom: -0.12em;
+    }
+    .hl-line > span {
+      display: block;
+      transform: translateY(112%);
+      animation: rise 1.5s var(--ease-quiet) forwards;
+    }
+    .hl-line:nth-child(1) > span { animation-delay: 0.5s; }
+    .hl-line:nth-child(2) > span { animation-delay: 0.72s; }
+    .hl-line--indent { padding-left: 2em; }
+    @keyframes rise { to { transform: translateY(0); } }
+
+    .subcopy {
+      margin-top: 44px;
+      font-size: 0.82rem;
+      letter-spacing: 0.14em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 1.35s forwards;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 34px;
+      left: var(--pad-x);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.34em;
+      color: var(--sumi-faint);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 2s forwards;
+    }
+    .scroll-hint i {
+      display: block;
+      width: 1px; height: 44px;
+      background: var(--sumi-faint);
+      transform-origin: top;
+      animation: hintLine 2.8s var(--ease-quiet) infinite;
+    }
+    @keyframes hintLine {
+      0%   { transform: scaleY(0); }
+      45%  { transform: scaleY(1); transform-origin: top; }
+      46%  { transform-origin: bottom; }
+      90%, 100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    .hero-tag {
+      position: absolute;
+      bottom: 34px;
+      right: var(--pad-x);
+      font-family: var(--mincho);
+      font-size: 0.72rem;
+      letter-spacing: 0.24em;
+      color: var(--sumi-faint);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 2s forwards;
+    }
+
+    /* ============================================================
+       2. NEWS（静かな帯）
+       ============================================================ */
+    .news {
+      position: relative;
+      z-index: 2;
+      padding: 56px 0;
+      border-top: 1px solid rgba(34, 31, 26, 0.08);
+      border-bottom: 1px solid rgba(34, 31, 26, 0.08);
+      background: var(--paper);
+    }
+    .news-grid {
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      gap: 36px;
+      align-items: start;
+    }
+    .news .en-label { margin: 6px 0 0; }
+    .news-rows { display: flex; flex-direction: column; }
+    .news-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 24px;
+      padding: 10px 0;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      border-bottom: 1px dashed rgba(34, 31, 26, 0.1);
+    }
+    .news-row:last-child { border-bottom: none; }
+    .news-row time {
+      font-family: var(--en);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--sumi-faint);
+      padding-top: 2px;
+    }
+    .news-row a { color: var(--sumi-soft); transition: color 0.4s; }
+    .news-row a:hover { color: var(--sumi); }
+    .news-all {
+      font-family: var(--en);
+      font-size: 0.66rem;
+      letter-spacing: 0.28em;
+      color: var(--sumi-faint);
+      padding-top: 8px;
+      border-bottom: 1px solid transparent;
+      transition: color 0.4s, border-color 0.4s;
+    }
+    .news-all:hover { color: var(--sumi); border-color: var(--sumi); }
+
+    /* ============================================================
+       3. MISSION — スクロールで文字が満ちる（ピン留め）
+       ============================================================ */
+    .mission {
+      position: relative;
+      z-index: 2;
+      height: 300vh;               /* スクロールの長さ＝演出の長さ */
+    }
+    .mission-pin {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mission-body {
+      max-width: 780px;
+      padding: 0 var(--pad-x);
+    }
+    .mission .en-label { text-align: center; }
+    .fill-text {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+      line-height: 2.3;
+      letter-spacing: 0.1em;
+      color: var(--ghost);
+    }
+    .fill-text em { font-style: normal; }
+    .fill-text .fc {
+      transition: color 0.35s linear;
+    }
+    .fill-text .fc.lit { color: var(--sumi); }
+    .fill-text .fc.lit.hi { color: var(--hi); }
+
+    /* ============================================================
+       4. ABOUT
+       ============================================================ */
+    .about {
+      position: relative;
+      z-index: 2;
+      padding: clamp(120px, 16vw, 220px) 0;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: clamp(48px, 7vw, 110px);
+      align-items: start;
+    }
+    .about-text p {
+      font-size: 0.88rem;
+      letter-spacing: 0.1em;
+      line-height: 2.5;
+      color: var(--sumi-soft);
+      margin-bottom: 26px;
+    }
+    .about-text p strong {
+      color: var(--sumi);
+      font-weight: 500;
+    }
+    .txt-link {
+      display: inline-block;
+      font-family: var(--mincho);
+      font-size: 0.82rem;
+      letter-spacing: 0.2em;
+      color: var(--sumi);
+      border-bottom: 1px solid rgba(34, 31, 26, 0.35);
+      padding-bottom: 6px;
+      transition: border-color 0.5s, color 0.5s;
+    }
+    .txt-link:hover { border-color: var(--hi); color: var(--hi); }
+
+    .about-points { display: flex; flex-direction: column; }
+    .about-point {
+      padding: 30px 0;
+      border-bottom: 1px solid rgba(34, 31, 26, 0.1);
+    }
+    .about-point:first-child { border-top: 1px solid rgba(34, 31, 26, 0.1); }
+    .about-point .num {
+      font-family: var(--en);
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      color: var(--hi);
+      display: block;
+      margin-bottom: 10px;
+    }
+    .about-point h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.02rem;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+    .about-point p {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       5. WHY — 番号つきの読みもの
+       ============================================================ */
+    .why {
+      position: relative;
+      z-index: 2;
+      padding: clamp(120px, 16vw, 220px) 0;
+      background: var(--paper-deep);
+    }
+    .why-list { display: flex; flex-direction: column; }
+    .why-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: clamp(24px, 5vw, 72px);
+      padding: clamp(40px, 5vw, 64px) 0;
+      border-bottom: 1px solid rgba(34, 31, 26, 0.12);
+    }
+    .why-item:first-child { border-top: 1px solid rgba(34, 31, 26, 0.12); }
+    .why-item .num {
+      font-family: var(--mincho);
+      font-size: clamp(1.4rem, 2.6vw, 2rem);
+      color: var(--sumi-faint);
+      line-height: 1.4;
+    }
+    .why-item h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+      letter-spacing: 0.1em;
+      margin-bottom: 18px;
+    }
+    .why-item p {
+      font-size: 0.85rem;
+      letter-spacing: 0.09em;
+      line-height: 2.4;
+      color: var(--sumi-soft);
+      max-width: 620px;
+    }
+
+    /* ============================================================
+       6. PRODUCT — HUSH（ピン留め：波が凪ぐ）
+       ============================================================ */
+    .product {
+      position: relative;
+      z-index: 2;
+      height: 300vh;
+    }
+    .product-pin {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .product-word {
+      font-family: var(--en);
+      font-weight: 500;
+      font-size: clamp(3.4rem, 11vw, 8rem);
+      color: var(--sumi);
+      letter-spacing: 0.5em;
+      padding-left: 0.5em;      /* letter-spacing 補正 */
+      opacity: 0;
+      will-change: opacity, letter-spacing, transform;
+      line-height: 1.2;
+    }
+    .product-caption {
+      margin-top: 30px;
+      font-family: var(--mincho);
+      font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+      letter-spacing: 0.22em;
+      color: var(--sumi-soft);
+      opacity: 0;
+      will-change: opacity, transform;
+    }
+    .product-sub {
+      margin-top: 20px;
+      font-size: 0.74rem;
+      letter-spacing: 0.16em;
+      color: var(--sumi-faint);
+      opacity: 0;
+      will-change: opacity;
+    }
+
+    /* 製品の続き（通常フロー） */
+    .product-detail {
+      position: relative;
+      z-index: 2;
+      padding: 0 0 clamp(120px, 16vw, 200px);
+    }
+    .product-detail .lead {
+      max-width: 640px;
+      font-size: 0.88rem;
+      letter-spacing: 0.1em;
+      line-height: 2.5;
+      color: var(--sumi-soft);
+      margin-bottom: 64px;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0 clamp(40px, 6vw, 88px);
+      max-width: 860px;
+    }
+    .feature {
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(34, 31, 26, 0.1);
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+    .feature i {
+      flex-shrink: 0;
+      width: 14px; height: 1px;
+      background: var(--hi);
+      transform: translateY(-4px);
+    }
+
+    /* ============================================================
+       7. TECHNOLOGY
+       ============================================================ */
+    .tech {
+      position: relative;
+      z-index: 2;
+      padding: clamp(120px, 16vw, 220px) 0;
+      background: var(--paper-deep);
+    }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(48px, 6vw, 88px) clamp(40px, 6vw, 88px);
+    }
+    .tech-item .num {
+      font-family: var(--en);
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      color: var(--hi);
+      display: block;
+      margin-bottom: 14px;
+    }
+    .tech-item h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.12rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 14px;
+    }
+    .tech-item p {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       8. USE CASES
+       ============================================================ */
+    .cases {
+      position: relative;
+      z-index: 2;
+      padding: clamp(120px, 16vw, 220px) 0;
+    }
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(28px, 4vw, 48px);
+    }
+    .case {
+      position: relative;
+      overflow: hidden;
+    }
+    .case figure {
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .case img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: sepia(0.14) saturate(0.85) brightness(1.02);
+      transform: scale(1.06);
+      transition: transform 1.6s var(--ease-quiet);
+      will-change: transform;
+    }
+    .case:hover img { transform: scale(1.0); }
+    .case .en {
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.32em;
+      color: var(--sumi-faint);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .case h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.05rem;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+    .case p {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       9. VISION — 線が地平線になる（ピン留め）
+       ============================================================ */
+    .vision {
+      position: relative;
+      z-index: 2;
+      height: 240vh;
+    }
+    .vision-pin {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .vision-body { max-width: 720px; padding: 0 var(--pad-x); }
+    .vision-body .en-label { text-align: center; }
+    .vision-title {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+      line-height: 2.1;
+      letter-spacing: 0.1em;
+      margin-bottom: 40px;
+      will-change: opacity, transform;
+    }
+    .vision-text {
+      font-size: 0.84rem;
+      letter-spacing: 0.1em;
+      line-height: 2.6;
+      color: var(--sumi-soft);
+      will-change: opacity, transform;
+    }
+
+    /* ============================================================
+       10. COMPANY
+       ============================================================ */
+    .company {
+      position: relative;
+      z-index: 2;
+      padding: clamp(120px, 16vw, 200px) 0;
+      background: var(--paper-deep);
+    }
+    .company-table {
+      width: 100%;
+      max-width: 760px;
+      border-collapse: collapse;
+    }
+    .company-table th,
+    .company-table td {
+      text-align: left;
+      padding: 22px 8px;
+      border-bottom: 1px solid rgba(34, 31, 26, 0.12);
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      font-weight: 400;
+      vertical-align: top;
+    }
+    .company-table th {
+      width: 190px;
+      color: var(--sumi-faint);
+      font-family: var(--mincho);
+      letter-spacing: 0.2em;
+      white-space: nowrap;
+    }
+    .company-table td { color: var(--sumi-soft); }
+
+    /* ============================================================
+       11. CONTACT
+       ============================================================ */
+    .contact {
+      position: relative;
+      z-index: 2;
+      padding: clamp(140px, 18vw, 240px) 0;
+      text-align: center;
+    }
+    .contact .en-label { text-align: center; }
+    .contact h2 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+      letter-spacing: 0.12em;
+      line-height: 1.9;
+      margin-bottom: 28px;
+    }
+    .contact p {
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      color: var(--sumi-soft);
+      margin-bottom: 56px;
+    }
+    .contact-link {
+      display: inline-block;
+      font-family: var(--mincho);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      letter-spacing: 0.3em;
+      color: var(--sumi);
+      border-bottom: 1px solid rgba(34, 31, 26, 0.4);
+      padding-bottom: 10px;
+      transition: color 0.5s, border-color 0.5s, letter-spacing 0.5s;
+    }
+    .contact-link:hover {
+      color: var(--hi);
+      border-color: var(--hi);
+      letter-spacing: 0.38em;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      position: relative;
+      z-index: 2;
+      border-top: 1px solid rgba(34, 31, 26, 0.1);
+      padding: 56px 0 46px;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .footer .brand { opacity: 0.85; }
+    .footer-nav {
+      display: flex;
+      gap: 28px;
+      font-family: var(--en);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: var(--sumi-soft);
+    }
+    .footer-nav a:hover { color: var(--sumi); }
+    .footer-copy {
+      width: 100%;
+      margin-top: 36px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(34, 31, 26, 0.08);
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--sumi-faint);
+    }
+
+    /* ============================================================
+       レスポンシブ
+       ============================================================ */
+    @media (max-width: 860px) {
+      .nav { display: none; }
+      .side-label { display: none; }
+      .headline { line-height: 1.85; }
+      .hl-line--indent { padding-left: 1em; }
+      .hero-tag { display: none; }
+      .news-grid { grid-template-columns: 1fr; gap: 16px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .why-item { grid-template-columns: 1fr; gap: 12px; }
+      .features { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: 1fr; }
+      .case-grid { grid-template-columns: 1fr; }
+      .company-table th { width: 110px; }
+      .mission { height: 260vh; }
+      .product { height: 260vh; }
+    }
+
+    /* ============================================================
+       reduced motion
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      .header, .subcopy, .side-label, .scroll-hint, .hero-tag { animation: none; opacity: 1; }
+      .hl-line > span { animation: none; transform: none; }
+      .scroll-hint i { animation: none; transform: scaleY(1); }
+      .rv { opacity: 1; transform: none; transition: none; }
+      .fill-text { color: var(--sumi); }
+      .mission, .product, .vision { height: auto; padding: 120px 0; }
+      .mission-pin, .product-pin, .vision-pin { position: static; height: auto; }
+      .product-word, .product-caption, .product-sub,
+      .vision-title, .vision-text { opacity: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="line-canvas" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="header" id="header">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="meldworks logo">
+        <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="14"/>
+        <circle cx="162" cy="170" r="10" fill="currentColor"/>
+        <circle cx="143" cy="285" r="24" fill="currentColor"/>
+        <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+        <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+        <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+      </svg>
+      <span>meldworks</span>
+    </a>
+    <nav class="nav">
+      <a href="#about">About</a>
+      <a href="#technology">Technology</a>
+      <a href="#product">Product</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <span class="lang"><b>JP</b> / EN</span>
+    </nav>
+  </header>
+
+  <p class="side-label" aria-label="ウェアラブル脳波計 HUSH"><span class="ch">ウ</span><span class="ch">ェ</span><span class="ch">ア</span><span class="ch">ラ</span><span class="ch">ブ</span><span class="ch">ル</span><span class="ch">脳</span><span class="ch">波</span><span class="ch">計</span><span class="sep" aria-hidden="true"></span><span class="ch en">H</span><span class="ch en">U</span><span class="ch en">S</span><span class="ch en">H</span></p>
+
+  <main>
+
+    <!-- 1. HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-inner" id="hero-inner">
+        <h1 class="headline">
+          <span class="hl-line"><span>感覚に頼る時代は、</span></span>
+          <span class="hl-line hl-line--indent"><span>終わる。</span></span>
+        </h1>
+        <p class="subcopy">
+          脳波を、日常のデータに。<br>
+          イヤホンのように装着するだけの、超小型ウェアラブル脳波計。
+        </p>
+      </div>
+      <div class="scroll-hint"><i></i><span>SCROLL</span></div>
+      <p class="hero-tag">まだ知らない自分を知る。</p>
+    </section>
+
+    <!-- 2. NEWS（プロトタイプでは静的なダミー） -->
+    <section class="news" id="news">
+      <div class="container">
+        <div class="news-grid">
+          <span class="en-label">NEWS</span>
+          <div class="news-rows">
+            <div class="news-row">
+              <time>2026.04.25</time>
+              <a href="#">BS朝日「fresh faces」にメルドワークスが出演</a>
+            </div>
+            <div class="news-row">
+              <time>2026.03.26</time>
+              <a href="#">Take Off Pitch にて CIC 賞および投資検討権を獲得</a>
+            </div>
+            <div class="news-row">
+              <time>2026.02.24</time>
+              <a href="#">YOAKE PITCH にて GREEN FUNDING 賞を受賞</a>
+            </div>
+          </div>
+          <a class="news-all" href="#">ALL NEWS</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. MISSION：スクロールで文字が満ちる -->
+    <section class="mission" id="mission">
+      <div class="mission-pin">
+        <div class="mission-body">
+          <span class="en-label" style="text-align:center; display:block;">OUR MISSION</span>
+          <p class="fill-text" id="fill-text">心拍、睡眠、活動量。からだの多くは、もう見えるようになった。けれど脳の状態だけが、まだ感覚のなかに取り残されている。私たちは脳波をあたりまえの日常データに変え、人が<em>まだ知らない自分</em>と出会える社会をつくる。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ABOUT -->
+    <section class="about" id="about">
+      <div class="container">
+        <span class="en-label rv">ABOUT</span>
+        <h2 class="sec-title rv">メルドワークスとは</h2>
+        <div class="about-grid">
+          <div class="about-text rv d1">
+            <p>
+              株式会社メルドワークスは、東京を拠点とするブレインテックスタートアップです。
+              これまで病院や研究機関でしか使えなかった脳波計を、
+              <strong>日常のウェアラブルデバイスとして再発明する</strong>ことに挑んでいます。
+            </p>
+            <p>
+              私たちの出発点は、「脳の状態が分かれば、人の生き方が変わる」という確信です。
+              ストレス、集中、疲労、覚醒——これらの情報が日常的に使えるようになったとき、
+              個人のパフォーマンスも、社会の在り方も、大きく変化すると考えています。
+            </p>
+            <a class="txt-link" href="#">会社情報の詳細</a>
+          </div>
+          <div class="about-points rv d2">
+            <div class="about-point">
+              <span class="num">01</span>
+              <h3>脳波に特化したチーム</h3>
+              <p>EEGの計測・解析に特化した技術と知見。</p>
+            </div>
+            <div class="about-point">
+              <span class="num">02</span>
+              <h3>日常で使える形へ</h3>
+              <p>実験室の装置を、毎日身につけられる道具に。</p>
+            </div>
+            <div class="about-point">
+              <span class="num">03</span>
+              <h3>信号から、行動へ</h3>
+              <p>データを可視化で終わらせず、日々の行動につなげる。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. WHY -->
+    <section class="why" id="why">
+      <div class="container">
+        <span class="en-label rv">WHY BRAINWAVE</span>
+        <h2 class="sec-title rv">なぜ、脳波なのか。</h2>
+        <div class="why-list">
+          <div class="why-item rv">
+            <span class="num">壱</span>
+            <div>
+              <h3>最も本質的な生体信号</h3>
+              <p>脳波は、思考・感情・集中・疲労・覚醒状態を直接反映する信号です。心拍や加速度では捉えられない内的状態を、リアルタイムで読み取ることができます。</p>
+            </div>
+          </div>
+          <div class="why-item rv">
+            <span class="num">弐</span>
+            <div>
+              <h3>まだ未開拓の領域</h3>
+              <p>ウェアラブル市場において、脳波の日常活用は世界的にもまだ発展途上です。技術的障壁が高い分、先行優位性が大きく、社会的インパクトも非常に大きい領域です。</p>
+            </div>
+          </div>
+          <div class="why-item rv">
+            <span class="num">参</span>
+            <div>
+              <h3>行動変容への可能性</h3>
+              <p>単なる可視化にとどまらず、脳の状態に基づいたフィードバックや習慣最適化へとつなげることで、人々の日常を根本から改善できる可能性を持っています。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PRODUCT：波が凪いで HUSH -->
+    <section class="product" id="product">
+      <div class="product-pin">
+        <div class="product-word" id="product-word">HUSH</div>
+        <p class="product-caption" id="product-caption">騒がしい信号が、静けさに変わる。</p>
+        <p class="product-sub" id="product-sub">ウェアラブル脳波計 ── COMING SOON</p>
+      </div>
+    </section>
+
+    <!-- 6b. PRODUCT 詳細 -->
+    <section class="product-detail">
+      <div class="container">
+        <p class="lead rv">
+          HUSHは、イヤホンのように装着するだけで脳波を計測できる、超小型のウェアラブルデバイスです。
+          日常生活の中で、あなたの状態を静かに観測し続けます。
+        </p>
+        <div class="features">
+          <div class="feature rv"><i></i>超小型設計</div>
+          <div class="feature rv d1"><i></i>ワイヤレスによる快適な装着感</div>
+          <div class="feature rv"><i></i>リアルタイム脳波計測</div>
+          <div class="feature rv d1"><i></i>アプリ・解析ソフトとの連携</div>
+          <div class="feature rv"><i></i>日常装着を前提とした設計思想</div>
+          <div class="feature rv d1" style="border-bottom-color: transparent;">
+            <a class="txt-link" href="#" style="font-size:0.8rem;">製品詳細を見る</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. TECHNOLOGY -->
+    <section class="tech" id="technology">
+      <div class="container">
+        <span class="en-label rv">TECHNOLOGY</span>
+        <h2 class="sec-title rv">技術的強み</h2>
+        <div class="tech-grid">
+          <div class="tech-item rv">
+            <span class="num">01</span>
+            <h3>超小型設計</h3>
+            <p>耳という限られたスペースに、高精度の脳波センサーを収める独自の実装技術。日常装着を可能にするための設計思想が起点にあります。</p>
+          </div>
+          <div class="tech-item rv d1">
+            <span class="num">02</span>
+            <h3>ノイズ処理・信号処理</h3>
+            <p>日常環境では、体動・筋電・電磁ノイズが混入します。これらを精度高く除去し、クリーンな脳波信号を抽出するアルゴリズムを独自開発しています。</p>
+          </div>
+          <div class="tech-item rv">
+            <span class="num">03</span>
+            <h3>リアルタイム解析基盤</h3>
+            <p>計測した脳波を即座に解析し、ユーザーの状態推定へと変換するリアルタイム処理パイプラインを構築。低遅延での状態フィードバックを実現します。</p>
+          </div>
+          <div class="tech-item rv d1">
+            <span class="num">04</span>
+            <h3>データ活用・行動変容</h3>
+            <p>蓄積された個人の脳波データを基に、状態パターンの学習・最適化フィードバックへと展開するデータ基盤の構想を持っています。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. USE CASES -->
+    <section class="cases" id="cases">
+      <div class="container">
+        <span class="en-label rv">USE CASES</span>
+        <h2 class="sec-title rv">活用シーン</h2>
+        <div class="case-grid">
+          <div class="case rv">
+            <figure><img src="../images/sports-athletes.png" alt="スポーツでの活用"></figure>
+            <span class="en">SPORT &amp; PERFORMANCE</span>
+            <h3>スポーツチーム・アスリート</h3>
+            <p>集中状態・覚醒レベルのリアルタイム把握。トレーニングの質と試合前の状態最適化に。</p>
+          </div>
+          <div class="case rv d1">
+            <figure><img src="../images/research-lab.jpg" alt="研究での活用"></figure>
+            <span class="en">RESEARCH &amp; EDUCATION</span>
+            <h3>研究機関・大学</h3>
+            <p>実験室の外での脳波データ取得を可能にし、フィールド認知科学研究の可能性を広げる。</p>
+          </div>
+          <div class="case rv">
+            <figure><img src="../images/enterprise-factory.jpg" alt="産業現場での活用"></figure>
+            <span class="en">ENTERPRISE &amp; INDUSTRY</span>
+            <h3>企業・産業現場</h3>
+            <p>覚醒度が安全に直結する現場で、ヒューマンエラー防止と安全管理の高度化に貢献。</p>
+          </div>
+          <div class="case rv d1">
+            <figure><img src="../images/personal-wellness.jpg" alt="個人での活用"></figure>
+            <span class="en">PERSONAL &amp; WELLNESS</span>
+            <h3>個人・セルフケア</h3>
+            <p>集中・リラックス・睡眠を自分のデータとして理解し、より良い習慣づくりを支える。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. VISION -->
+    <section class="vision" id="vision">
+      <div class="vision-pin">
+        <div class="vision-body">
+          <span class="en-label" style="display:block;">VISION</span>
+          <h2 class="vision-title" id="vision-title">
+            自分の状態を知ることが、<br>
+            あたりまえになる社会へ。
+          </h2>
+          <p class="vision-text" id="vision-text">
+            脳波はかつて、特別な場所・特別な人のためのものでした。<br>
+            私たちは、それを変えようとしています。<br><br>
+            自分の集中を知り、疲労を知り、回復を知る。<br>
+            メルドワークスは、脳波という静かな信号から、<br>
+            人の可能性を広げることに挑み続けます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. COMPANY -->
+    <section class="company" id="company">
+      <div class="container">
+        <span class="en-label rv">COMPANY</span>
+        <h2 class="sec-title rv">会社概要</h2>
+        <table class="company-table rv d1">
+          <tbody>
+            <tr><th>会社名</th><td>株式会社メルドワークス（meldworks Co., Ltd）</td></tr>
+            <tr><th>所在地</th><td>東京都渋谷区円山町5番5号 Navi渋谷Ⅴ 3階</td></tr>
+            <tr><th>代表取締役</th><td>林 裕也</td></tr>
+            <tr><th>事業内容</th><td>ウェアラブル脳波計の開発および、それを用いたソフトウェア・データ活用サービスの提供</td></tr>
+            <tr><th>主力製品</th><td>HUSH（ウェアラブル脳波計）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 11. CONTACT -->
+    <section class="contact" id="contact">
+      <div class="container">
+        <span class="en-label rv" style="display:block;">CONTACT</span>
+        <h2 class="rv">お気軽にご連絡ください。</h2>
+        <p class="rv d1">製品・技術・採用・事業連携など、どのようなご相談もお待ちしています。</p>
+        <a class="contact-link rv d2" href="#">お問い合わせはこちら</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <a class="brand" href="#">
+          <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="14"/>
+            <circle cx="162" cy="170" r="10" fill="currentColor"/>
+            <circle cx="143" cy="285" r="24" fill="currentColor"/>
+            <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+          </svg>
+          <span>meldworks</span>
+        </a>
+        <nav class="footer-nav">
+          <a href="#about">About</a>
+          <a href="#technology">Technology</a>
+          <a href="#product">Product</a>
+          <a href="#news">News</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <div class="footer-copy">
+          <span>© 2026 meldworks. All rights reserved.</span>
+          <span>まだ知らない自分を知る。</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ============================================================
+       スクロール演出エンジン（依存ライブラリなし）
+       ・rAF 1本で全シーンの進行度を計算して適用する
+       ・進行度 = そのシーン内をどこまでスクロールしたか（0〜1）
+       ============================================================ */
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clamp01 = v => Math.max(0, Math.min(1, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    /* ── ピン留めシーンの進行度 ──
+       コンテナ（height: N vh）の先頭が画面上端に達してから
+       末尾が画面下端に達するまでを 0〜1 とする */
+    function pinProgress(el) {
+      const rect = el.getBoundingClientRect();
+      const total = el.offsetHeight - window.innerHeight;
+      if (total <= 0) return 1;
+      return clamp01(-rect.top / total);
+    }
+
+    /* ============================================================
+       1. 一本の線（背景 Canvas）
+       ・スクロール速度で波打つ（ヒーローの体験）
+       ・製品シーンでは進行度に応じて凪いでいく
+       ・ビジョンシーンでは薄れて地平線になる
+       ============================================================ */
+    const lineState = { calm: 0, fade: 0 };   // シーン側から毎フレーム更新
+
+    (function () {
+      const canvas = document.getElementById('line-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, dpr;
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function wave(x, t) {
+        return Math.sin(x * 0.0036 + t * 0.6) * 0.5
+             + Math.sin(x * 0.0082 - t * 0.38) * 0.3
+             + Math.sin(x * 0.0158 + t * 0.9) * 0.2;
+      }
+
+      const C0 = [196, 190, 174];
+      const C1 = [226, 86, 31];
+      function lerpColor(k) {
+        return `rgb(${Math.round(lerp(C0[0], C1[0], k))},${Math.round(lerp(C0[1], C1[1], k))},${Math.round(lerp(C0[2], C1[2], k))})`;
+      }
+
+      let lastY = window.scrollY, vel = 0;
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        vel = Math.min(60, vel + Math.abs(y - lastY) * 0.22);
+        lastY = y;
+      }, { passive: true });
+
+      let amp = 0, warm = 0;
+      const startTime = performance.now();
+
+      function frame(now) {
+        const t = now * 0.001;
+
+        const el = (now - startTime - 300) / 1600;
+        const progress = REDUCED ? 1 : clamp01(el);
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        vel *= 0.93;
+        const calm = lineState.calm;                    // 0=通常 1=完全に凪
+        const targetAmp = REDUCED ? 4 : (6 + vel * 1.1) * (1 - calm);
+        amp += (targetAmp - amp) * 0.055;
+        const targetWarm = REDUCED ? 0 : Math.min(1, vel / 46) * (1 - calm);
+        warm += (targetWarm - warm) * 0.045;
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.globalAlpha = 1 - lineState.fade * 0.82;
+
+        const baseY = H * 0.66;
+        const endX = W * eased;
+
+        ctx.beginPath();
+        for (let x = 0; x <= endX; x += 4) {
+          const y = baseY + wave(x, t) * amp;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = lerpColor(warm * 0.8);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        if (eased > 0.98) {
+          const dx = W * (0.5 + 0.36 * Math.sin(t * 0.07));
+          const dy = baseY + wave(dx, t) * amp;
+          ctx.beginPath();
+          ctx.arc(dx, dy, 3, 0, Math.PI * 2);
+          ctx.fillStyle = '#e2561f';
+          ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    /* ============================================================
+       2. MISSION：文字がスクロールで満ちる
+       ============================================================ */
+    (function () {
+      const box = document.getElementById('fill-text');
+      if (!box || REDUCED) return;
+
+      // <em> は強調（オレンジで満ちる）として扱い、構造を保って1文字ずつ分割
+      const chars = [];
+      function split(node, hi) {
+        Array.from(node.childNodes).forEach(child => {
+          if (child.nodeType === Node.TEXT_NODE) {
+            const frag = document.createDocumentFragment();
+            for (const ch of child.textContent) {
+              const s = document.createElement('span');
+              s.className = 'fc' + (hi ? ' hi-cand' : '');
+              s.textContent = ch;
+              frag.appendChild(s);
+              chars.push({ el: s, hi });
+            }
+            child.replaceWith(frag);
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            split(child, hi || child.tagName === 'EM');
+          }
+        });
+      }
+      split(box, false);
+
+      let litCount = -1;
+      window.__updateMission = function (p) {
+        // 進行度 0.1〜0.9 の間で全文字が満ちる
+        const k = clamp01((p - 0.08) / 0.78);
+        const n = Math.round(k * chars.length);
+        if (n === litCount) return;
+        litCount = n;
+        chars.forEach((c, i) => {
+          c.el.classList.toggle('lit', i < n);
+          if (c.hi) c.el.classList.toggle('hi', i < n);
+        });
+      };
+    })();
+
+    /* ============================================================
+       3. メインループ：各シーンの進行度を計算して適用
+       ============================================================ */
+    (function () {
+      if (REDUCED) return;
+
+      const heroInner   = document.getElementById('hero-inner');
+      const hero        = document.getElementById('hero');
+      const mission     = document.getElementById('mission');
+      const product     = document.getElementById('product');
+      const pWord       = document.getElementById('product-word');
+      const pCaption    = document.getElementById('product-caption');
+      const pSub        = document.getElementById('product-sub');
+      const vision      = document.getElementById('vision');
+      const vTitle      = document.getElementById('vision-title');
+      const vText       = document.getElementById('vision-text');
+      const header      = document.getElementById('header');
+
+      function frame() {
+        const vh = window.innerHeight;
+        const y  = window.scrollY;
+
+        /* ヘッダー：少し下がったら紙色の帯に */
+        header.classList.toggle('solid', y > vh * 0.6);
+
+        /* ヒーロー：スクロールで静かに退場 */
+        const hp = clamp01(y / (vh * 0.9));
+        heroInner.style.transform = `translateY(${-6 - hp * 8}vh)`;
+        heroInner.style.opacity = String(1 - hp * 1.15);
+
+        /* ミッション：文字が満ちる */
+        if (window.__updateMission) window.__updateMission(pinProgress(mission));
+
+        /* 製品：波が凪ぎ、HUSH が浮かび上がる */
+        const pp = pinProgress(product);
+        //   0.0-0.55 : 線が凪いでいく
+        //   0.15-0.6 : HUSH がにじみ出て字間が締まる
+        //   0.5-0.75 : キャプション
+        //   0.65-0.85: サブ
+        const calmK = clamp01(pp / 0.55);
+        const inProduct = pp > 0 && pp < 1;
+        lineState.calm = inProduct ? calmK : 0;
+
+        const wordK = clamp01((pp - 0.15) / 0.45);
+        const we = 1 - Math.pow(1 - wordK, 3);
+        pWord.style.opacity = String(we);
+        pWord.style.letterSpacing = `${lerp(0.5, 0.22, we)}em`;
+        pWord.style.paddingLeft = `${lerp(0.5, 0.22, we)}em`;
+        pWord.style.transform = `translateY(${lerp(24, 0, we)}px)`;
+
+        const capK = clamp01((pp - 0.5) / 0.25);
+        pCaption.style.opacity = String(capK);
+        pCaption.style.transform = `translateY(${lerp(18, 0, capK)}px)`;
+
+        const subK = clamp01((pp - 0.65) / 0.2);
+        pSub.style.opacity = String(subK);
+
+        /* ビジョン：線がほどけて地平線に、文がゆっくり現れて留まる */
+        const vp = pinProgress(vision);
+        const inVision = vp > 0 && vp < 1;
+        lineState.fade = inVision ? clamp01(vp / 0.5) : 0;
+
+        const vtK = clamp01((vp - 0.05) / 0.3);
+        vTitle.style.opacity = String(vtK);
+        vTitle.style.transform = `translateY(${lerp(30, 0, 1 - Math.pow(1 - vtK, 3))}px)`;
+
+        const vxK = clamp01((vp - 0.25) / 0.3);
+        vText.style.opacity = String(vxK);
+        vText.style.transform = `translateY(${lerp(24, 0, 1 - Math.pow(1 - vxK, 3))}px)`;
+
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    /* ============================================================
+       4. 静かなリビール（IO）
+       ============================================================ */
+    (function () {
+      const els = document.querySelectorAll('.rv');
+      if (REDUCED) { els.forEach(el => el.classList.add('on')); return; }
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('on');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(el => io.observe(el));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>meldworks — BRAND CODE v2「静かな技術。」</title>
+  <meta name="robots" content="noindex">
+
+  <!--
+    ============================================================
+    meldworks BRAND CODE v2
+    「静かな技術。」— 紙の静けさと、計測の闇。
+    このブランドに登場する波形は、すべて実測の脳波である
+    （本ボードの波形は実データ導入までの擬似生成。特性は実波形に準拠）。
+    ============================================================
+  -->
+
+  <!-- フォントはセルフホスト（読み込みの安定性とプライバシーのため） -->
+  <link rel="stylesheet" href="../fonts/fonts.css">
+
+  <style>
+    :root {
+      --paper:      #f7f4ee;
+      --paper-deep: #efeadf;
+      --sumi:       #221f1a;
+      --ink:        #12100c;   /* 信号状態の墨（より深い） */
+      --sumi-soft:  #6e695e;
+      --sumi-faint: #a09a8c;
+      --usugrey:    #c4beae;
+      --ten:        #e2561f;   /* 点 — シグナルオレンジ */
+      --phos:       #37ffa5;   /* 燐光 — 墨の上でしか光らない */
+      --phos-dim:   rgba(55, 255, 165, 0.34);
+
+      --mincho: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      --sans:   'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      --en:     'Inter', sans-serif;
+
+      --pad-x: clamp(28px, 6vw, 104px);
+      --hairline: 1px solid rgba(34, 31, 26, 0.15);
+      --hairline-inv: 1px solid rgba(247, 244, 238, 0.14);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--paper);
+      color: var(--sumi);
+      font-family: var(--sans);
+      font-weight: 400;
+      line-height: 2;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.13 0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* ============================================================
+       共通：頁（セクション）
+       ============================================================ */
+    .page {
+      position: relative;
+      padding: clamp(56px, 7vw, 96px) var(--pad-x) clamp(72px, 9vw, 128px);
+      border-bottom: var(--hairline);
+    }
+    .page-inner { max-width: 1180px; margin: 0 auto; }
+
+    /* 柱（本のランニングヘッド） */
+    .running {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 14px;
+      border-bottom: var(--hairline);
+      margin-bottom: clamp(48px, 6vw, 88px);
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.34em;
+      color: var(--sumi-faint);
+    }
+
+    .page--ink {
+      background: var(--ink);
+      color: var(--paper);
+      border-bottom: none;
+    }
+    .page--ink .running {
+      border-bottom: var(--hairline-inv);
+      color: rgba(247, 244, 238, 0.4);
+    }
+    /* 信号状態の目盛り（オシロスコープの graticule） */
+    .page--ink::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(55, 255, 165, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(55, 255, 165, 0.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+    }
+    .page--ink .page-inner { position: relative; }
+
+    .chapter {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+      letter-spacing: 0.18em;
+      line-height: 1.7;
+      margin-bottom: clamp(36px, 5vw, 64px);
+    }
+    .ten { color: var(--ten); }
+
+    .note {
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      line-height: 2.4;
+      color: var(--sumi-soft);
+    }
+    .page--ink .note { color: rgba(247, 244, 238, 0.55); }
+
+    /* 標本ラベル */
+    .spec-label {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 0;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      color: var(--sumi-faint);
+    }
+    .spec-label b {
+      font-weight: 400;
+      font-family: var(--sans);
+      letter-spacing: 0.18em;
+    }
+    .spec-label i { font-style: normal; opacity: 0.5; margin: 0 10px; }
+    .page--ink .spec-label { color: var(--phos-dim); }
+    .page--ink .spec-label b { color: rgba(247, 244, 238, 0.6); }
+
+    /* ============================================================
+       表紙
+       ============================================================ */
+    .cover { padding-top: clamp(72px, 9vw, 128px); }
+    .cover-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: clamp(88px, 12vw, 170px);
+    }
+    .brand-mark { display: flex; align-items: center; gap: 12px; }
+    .brand-mark svg { width: 30px; height: 30px; }
+    .brand-mark span {
+      font-family: var(--en);
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+    .cover-meta {
+      text-align: right;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.32em;
+      line-height: 2.1;
+      color: var(--sumi-faint);
+    }
+    .cover-title {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: clamp(3rem, 9vw, 7.2rem);
+      letter-spacing: 0.08em;
+      line-height: 1.4;
+      margin-bottom: 40px;
+    }
+    .cover-lead {
+      max-width: 600px;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      line-height: 2.6;
+      color: var(--sumi-soft);
+      margin-bottom: clamp(64px, 8vw, 110px);
+    }
+    .cover-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .cover-wave { width: min(420px, 100%); }
+    .cover-wave svg { width: 100%; height: auto; display: block; }
+    .cover-wave .spec-label { margin-top: 10px; }
+    .cover-edition {
+      font-family: var(--mincho);
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      color: var(--sumi-faint);
+    }
+
+    /* ============================================================
+       信号の間奏（黒）
+       ============================================================ */
+    .interlude {
+      padding: clamp(96px, 13vw, 190px) var(--pad-x);
+    }
+    .interlude .page-inner {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(40px, 6vw, 72px);
+    }
+    .interlude-statement {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.6rem, 3.6vw, 2.8rem);
+      letter-spacing: 0.14em;
+      line-height: 2;
+    }
+    .scope { width: 100%; }
+    .scope svg { width: 100%; height: auto; display: block; }
+    .scope .spec-label { margin-top: 18px; justify-content: flex-end; }
+
+    /* 燐光の発光 */
+    .ph { filter: drop-shadow(0 0 6px rgba(55, 255, 165, 0.65)); }
+
+    /* ============================================================
+       01 核
+       ============================================================ */
+    .core-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(28px, 4vw, 64px);
+      margin-bottom: clamp(48px, 6vw, 80px);
+    }
+    .core h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.35rem;
+      letter-spacing: 0.22em;
+      margin-bottom: 4px;
+    }
+    .core .en {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.34em;
+      color: var(--sumi-faint);
+      margin-bottom: 16px;
+    }
+    .core p {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+    }
+    .okite {
+      border-top: 2px solid var(--sumi);
+      padding-top: 28px;
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: clamp(20px, 4vw, 56px);
+      align-items: baseline;
+    }
+    .okite h3 {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: 1.05rem;
+      letter-spacing: 0.3em;
+    }
+    .okite p {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.05rem, 2vw, 1.4rem);
+      letter-spacing: 0.12em;
+      line-height: 2.2;
+    }
+    .okite small {
+      display: block;
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--sumi-soft);
+      margin-top: 14px;
+      line-height: 2.2;
+    }
+
+    /* ============================================================
+       02 状態（凪／信号）
+       ============================================================ */
+    .states {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: var(--hairline);
+    }
+    .state {
+      padding: clamp(32px, 4.5vw, 64px);
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+    }
+    .state--nagi { background: var(--paper); }
+    .state--shingo {
+      background: var(--ink);
+      color: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
+    .state--shingo::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(55, 255, 165, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(55, 255, 165, 0.05) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+    .state-name {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      letter-spacing: 0.3em;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .state-en {
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.34em;
+      color: var(--sumi-faint);
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .state--shingo .state-en { color: var(--phos-dim); }
+    .state p {
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      line-height: 2.4;
+      color: var(--sumi-soft);
+      position: relative;
+      margin-bottom: auto;
+    }
+    .state--shingo p { color: rgba(247, 244, 238, 0.55); }
+    .state svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 32px;
+      position: relative;
+    }
+    .states-note { margin-top: 24px; max-width: 720px; }
+
+    /* ============================================================
+       03 印 — 実測脳波の標本
+       ============================================================ */
+    .specimens { border-top: var(--hairline); }
+    .specimen {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: clamp(24px, 4vw, 64px);
+      align-items: center;
+      padding: clamp(28px, 3.6vw, 44px) 0;
+      border-bottom: var(--hairline);
+    }
+    .specimen-name h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.15rem;
+      letter-spacing: 0.26em;
+    }
+    .specimen-name span {
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.28em;
+      color: var(--sumi-faint);
+    }
+    .specimen-wave svg { width: 100%; height: auto; display: block; }
+    .specimen-wave .spec-label { margin-top: 8px; }
+    .specimen-rule { margin-top: 28px; max-width: 720px; }
+
+    /* ============================================================
+       04 色
+       ============================================================ */
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: clamp(12px, 1.8vw, 22px);
+      margin-bottom: clamp(36px, 5vw, 56px);
+    }
+    .swatch .chip {
+      aspect-ratio: 1 / 1.15;
+      border: var(--hairline);
+      position: relative;
+    }
+    .swatch .chip--ten {
+      background: var(--paper);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .swatch .chip--ten::after {
+      content: '';
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      background: var(--ten);
+    }
+    .swatch .chip--phos {
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .swatch .chip--phos::after {
+      content: '';
+      width: 46%;
+      height: 1.5px;
+      background: var(--phos);
+      box-shadow: 0 0 8px rgba(55, 255, 165, 0.8);
+    }
+    .swatch h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      margin-top: 12px;
+    }
+    .swatch .code {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      color: var(--sumi-faint);
+      margin-top: 2px;
+    }
+    .swatch .use {
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      line-height: 1.9;
+      color: var(--sumi-soft);
+      margin-top: 6px;
+    }
+    .color-rules {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 40px);
+    }
+    .color-rule {
+      border-left: 2px solid var(--sumi);
+      padding-left: clamp(16px, 2vw, 28px);
+    }
+    .color-rule h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.2em;
+      margin-bottom: 8px;
+    }
+    .color-rule p {
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      line-height: 2.2;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       05 文字
+       ============================================================ */
+    .type-rows { border-top: var(--hairline); }
+    .type-row {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: clamp(20px, 4vw, 56px);
+      padding: clamp(28px, 3.6vw, 44px) 0;
+      border-bottom: var(--hairline);
+      align-items: baseline;
+    }
+    .type-role h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.92rem;
+      letter-spacing: 0.18em;
+      margin-bottom: 4px;
+    }
+    .type-role span {
+      font-family: var(--en);
+      font-size: 0.56rem;
+      letter-spacing: 0.24em;
+      color: var(--sumi-faint);
+    }
+    .spec-mincho {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.5rem, 3.4vw, 2.6rem);
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+    }
+    .spec-sans {
+      font-size: 0.88rem;
+      letter-spacing: 0.1em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+    }
+    .spec-en-type {
+      font-family: var(--en);
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      letter-spacing: 0.05em;
+      font-variant-numeric: tabular-nums;
+    }
+    .spec-en-type small {
+      display: block;
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      color: var(--sumi-faint);
+      margin-top: 8px;
+    }
+
+    /* ============================================================
+       06 製品（黒・図面）
+       ============================================================ */
+    .blueprint {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: clamp(40px, 6vw, 88px);
+      align-items: center;
+    }
+    .blueprint-figure svg { width: 100%; height: auto; display: block; }
+    .bp-rules { display: flex; flex-direction: column; gap: clamp(24px, 3vw, 40px); }
+    .bp-rule { border-left: 1px solid rgba(247, 244, 238, 0.25); padding-left: 22px; }
+    .bp-rule h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.22em;
+      margin-bottom: 6px;
+      color: var(--paper);
+    }
+    .bp-rule p {
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      line-height: 2.2;
+      color: rgba(247, 244, 238, 0.55);
+    }
+    .cw-chips {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .cw-chip { display: flex; align-items: center; gap: 8px; }
+    .cw-chip i {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .cw-chip span {
+      font-family: var(--en);
+      font-size: 0.56rem;
+      letter-spacing: 0.24em;
+      color: rgba(247, 244, 238, 0.5);
+    }
+
+    /* ============================================================
+       07 言葉
+       ============================================================ */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 40px);
+      margin-bottom: clamp(40px, 5vw, 64px);
+    }
+    .voice-col { border-top: 2px solid var(--sumi); padding-top: 22px; }
+    .voice-col--avoid { border-top-color: var(--usugrey); }
+    .voice-col h4 {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.34em;
+      color: var(--sumi-faint);
+      margin-bottom: 18px;
+    }
+    .voice-col li {
+      list-style: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      padding: 9px 0;
+      border-bottom: 1px dashed rgba(34, 31, 26, 0.12);
+    }
+    .voice-col--avoid li {
+      color: var(--sumi-faint);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+      text-decoration-color: rgba(34, 31, 26, 0.35);
+    }
+    .voice-example { max-width: 860px; }
+    .voice-example .before {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: var(--sumi-faint);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+      margin-bottom: 14px;
+    }
+    .voice-example .after {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+      letter-spacing: 0.13em;
+      line-height: 2.1;
+    }
+
+    /* ============================================================
+       08 展開
+       ============================================================ */
+    .apps {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(24px, 3.5vw, 44px);
+    }
+    .app { display: flex; flex-direction: column; gap: 14px; }
+    .app-mock {
+      border: var(--hairline);
+      min-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(28px, 4vw, 52px);
+    }
+    .app-label {
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      color: var(--sumi-faint);
+    }
+
+    /* 名刺（実測脳波入り） */
+    .meishi {
+      width: 100%;
+      max-width: 300px;
+      aspect-ratio: 91/55;
+      background: var(--paper);
+      border: var(--hairline);
+      box-shadow: 10px 10px 0 rgba(34, 31, 26, 0.05);
+      padding: 18px 20px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .meishi .m-top { display: flex; align-items: center; gap: 7px; }
+    .meishi .m-top svg { width: 15px; height: 15px; }
+    .meishi .m-top span {
+      font-family: var(--en);
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+    .meishi .m-name {
+      margin-top: auto;
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.24em;
+    }
+    .meishi .m-role {
+      font-family: var(--en);
+      font-size: 0.5rem;
+      letter-spacing: 0.24em;
+      color: var(--sumi-faint);
+      margin-bottom: 10px;
+    }
+    .meishi svg.m-wave { width: 100%; height: auto; display: block; }
+    .meishi .m-spec {
+      font-family: var(--en);
+      font-size: 0.44rem;
+      letter-spacing: 0.18em;
+      color: var(--sumi-faint);
+      margin-top: 4px;
+    }
+
+    /* アプリ（信号状態） */
+    .app-mock--ink { background: var(--ink); border-color: var(--ink); }
+    .phone {
+      width: 100%;
+      max-width: 190px;
+      aspect-ratio: 9/17.5;
+      border: 1.5px solid rgba(247, 244, 238, 0.35);
+      border-radius: 24px;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 24px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .phone::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(55, 255, 165, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(55, 255, 165, 0.05) 1px, transparent 1px);
+      background-size: 26px 26px;
+    }
+    .phone > * { position: relative; }
+    .phone .p-head {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.48rem;
+      letter-spacing: 0.28em;
+      color: rgba(247, 244, 238, 0.45);
+      margin-bottom: 18px;
+    }
+    .phone .p-head .rec { color: var(--ten); }
+    .phone .p-state {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.05rem;
+      letter-spacing: 0.14em;
+      line-height: 1.9;
+    }
+    .phone .p-sub {
+      font-size: 0.54rem;
+      letter-spacing: 0.12em;
+      color: rgba(247, 244, 238, 0.5);
+      margin-bottom: auto;
+    }
+    .phone svg { width: 100%; height: auto; display: block; }
+    .phone .p-foot {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.46rem;
+      letter-spacing: 0.2em;
+      color: var(--phos-dim);
+      margin-top: 10px;
+    }
+
+    /* ヒーロー（ウェブ） */
+    .hero-mock {
+      width: 100%;
+      max-width: 460px;
+      aspect-ratio: 16/10.5;
+      background: var(--paper);
+      border: var(--hairline);
+      box-shadow: 10px 10px 0 rgba(34, 31, 26, 0.05);
+      padding: 8% 7% 6%;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-mock .h-brand {
+      font-family: var(--en);
+      font-size: 0.52rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      margin-bottom: auto;
+    }
+    .hero-mock .h-title {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+      letter-spacing: 0.1em;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .hero-mock svg { width: 78%; height: auto; display: block; }
+    .hero-mock .h-spec {
+      font-family: var(--en);
+      font-size: 0.44rem;
+      letter-spacing: 0.16em;
+      color: var(--sumi-faint);
+      margin-top: 6px;
+    }
+    .hero-mock .h-spec b {
+      font-family: var(--sans);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+    }
+
+    /* パッケージ */
+    .box {
+      width: 100%;
+      max-width: 210px;
+      aspect-ratio: 1/1.06;
+      background: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 22px;
+      box-shadow: 10px 10px 0 rgba(34, 31, 26, 0.05);
+    }
+    .box .b-word {
+      font-family: var(--en);
+      font-weight: 500;
+      font-size: 1.3rem;
+      letter-spacing: 0.5em;
+      padding-left: 0.5em;
+      color: var(--paper);
+    }
+    .box svg { width: 70%; height: auto; display: block; }
+    .box .b-tag {
+      font-family: var(--mincho);
+      font-size: 0.56rem;
+      letter-spacing: 0.28em;
+      color: rgba(247, 244, 238, 0.5);
+    }
+
+    /* ============================================================
+       裏表紙（黒）
+       ============================================================ */
+    .backcover {
+      padding: clamp(110px, 15vw, 210px) var(--pad-x);
+      text-align: center;
+    }
+    .backcover .page-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 44px;
+    }
+    .backcover svg.bc-logo { width: 52px; height: 52px; color: var(--paper); }
+    .backcover .bc-tag {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.3rem, 2.8vw, 2rem);
+      letter-spacing: 0.24em;
+      color: var(--paper);
+    }
+    .backcover svg.bc-wave { width: min(520px, 90%); height: auto; }
+    .backcover .bc-foot {
+      font-family: var(--en);
+      font-size: 0.54rem;
+      letter-spacing: 0.4em;
+      color: rgba(247, 244, 238, 0.35);
+    }
+
+    /* ============================================================
+       レスポンシブ
+       ============================================================ */
+    @media (max-width: 860px) {
+      .core-grid { grid-template-columns: 1fr; }
+      .okite { grid-template-columns: 1fr; gap: 10px; }
+      .states { grid-template-columns: 1fr; }
+      .swatches { grid-template-columns: repeat(3, 1fr); }
+      .color-rules { grid-template-columns: 1fr; }
+      .type-row { grid-template-columns: 1fr; gap: 8px; }
+      .specimen { grid-template-columns: 1fr; gap: 12px; }
+      .blueprint { grid-template-columns: 1fr; }
+      .voice-grid { grid-template-columns: 1fr; }
+      .apps { grid-template-columns: 1fr; }
+      .cover-foot { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ============ 表紙（凪） ============ -->
+  <header class="page cover">
+    <div class="page-inner">
+      <div class="cover-head">
+        <div class="brand-mark">
+          <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="meldworks logo">
+            <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="14"/>
+            <circle cx="162" cy="170" r="10" fill="currentColor"/>
+            <circle cx="143" cy="285" r="24" fill="currentColor"/>
+            <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+          </svg>
+          <span>meldworks</span>
+        </div>
+        <p class="cover-meta">BRAND CODE — SECOND EDITION<br>TOKYO, 2026</p>
+      </div>
+
+      <h1 class="cover-title">静かな技術<span class="ten">。</span></h1>
+      <p class="cover-lead">
+        騒がず、日常に溶け込み、内面を静かに照らす。<br>
+        そして——このブランドに描かれる波は、すべて本物の脳波である。
+      </p>
+
+      <div class="cover-foot">
+        <div class="cover-wave">
+          <svg id="w-cover" viewBox="0 0 420 64" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+          <p class="spec-label"><span>SPECIMEN 001</span><i>／</i><span>α 9.8 Hz</span><i>／</i><span>2026.07.07 06:12</span><i>／</i><b>起床、まだ静か</b></p>
+        </div>
+        <p class="cover-edition">紙と墨と、ひとつの信号</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ 間奏（信号） ============ -->
+  <section class="page page--ink interlude">
+    <div class="page-inner">
+      <h2 class="interlude-statement">
+        これは、飾りではない<span class="ten">。</span><br>
+        誰かの、ほんとうの脳波である<span class="ten">。</span>
+      </h2>
+      <div class="scope">
+        <svg id="w-scope" viewBox="0 0 1100 220" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+        <p class="spec-label"><span>SPECIMEN 002</span><i>／</i><span>β 18.4 Hz</span><i>／</i><span>2026.07.02 10:41</span><i>／</i><b>資料づくり、集中の底</b><i>／</i><span>Y.H. — CONSENTED</span></p>
+      </div>
+      <p class="note" style="max-width: 640px;">
+        装飾のための波線を、このブランドは一本も持たない。
+        波が描かれるとき、それは必ず実在の計測データであり、採取の記録を添える。
+        美しさは作画からではなく、事実から来る。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 01 核（凪） ============ -->
+  <section class="page">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>01 — CORE</span></div>
+      <h2 class="chapter">核<span class="ten">。</span></h2>
+      <div class="core-grid">
+        <div class="core">
+          <h3>静けさ</h3>
+          <span class="en">CALM</span>
+          <p>技術が前に出ない。データで騒がない。急かさない。製品名 HUSH が示す通り、静けさはこのブランドの第一言語。</p>
+        </div>
+        <div class="core">
+          <h3>誠実</h3>
+          <span class="en">HONEST</span>
+          <p>脳を扱う会社だからこそ、科学的な謙虚さを保つ。言い切りすぎない。できないことを盛らない。それが信頼になる。</p>
+        </div>
+        <div class="core">
+          <h3>溶け込む</h3>
+          <span class="en">MELD</span>
+          <p>実験室の装置を、毎日の道具に。デバイスは肌に、データは生活に、ブランドは日常に馴染む。</p>
+        </div>
+      </div>
+      <div class="okite">
+        <h3>一つの掟</h3>
+        <div>
+          <p>本物の脳波しか、描かない<span class="ten">。</span></p>
+          <small>
+            名刺の一人ひとりに本人の波を。ウェブには「これは、代表の今朝の脳波」を。パッケージには「あなたの最初の脳波」を。
+            アイデンティティは毎回違う形で生成されるのに、一目でメルドワークスだと分かる——脳波を持つ会社にしか、真似できない。
+            （公開は本人同意の社内データから始める）
+          </small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 状態 ============ -->
+  <section class="page">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>02 — TWO STATES</span></div>
+      <h2 class="chapter">二つの状態<span class="ten">。</span></h2>
+      <div class="states">
+        <div class="state state--nagi">
+          <h3 class="state-name">凪</h3>
+          <span class="state-en">NAGI — AT REST</span>
+          <p>紙と墨と余白。ブランドの平常時。読むこと、考えることのための静かな地面。ウェブの本文、資料、店頭——ほとんどの時間、ブランドはこの状態にいる。</p>
+          <svg id="w-nagi" viewBox="0 0 420 56" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <div class="state state--shingo">
+          <h3 class="state-name">信号</h3>
+          <span class="state-en">SHINGO — MEASURING</span>
+          <p>計測の瞬間だけ、世界が墨に反転し、燐光の波が走る。アプリの計測画面、ウェブの製品シーン、映像の暗転。長居はしない——信号は一瞬だから記憶に残る。</p>
+          <svg id="w-shingo" viewBox="0 0 420 56" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </div>
+      <p class="note states-note">
+        静けさに緩急を与えるのがこの二状態。白い頁が続くなかに一度だけ現れる黒い頁——その落差が「静かなのに、忘れられない」をつくる。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 03 印 ============ -->
+  <section class="page">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>03 — IDENTITY</span></div>
+      <h2 class="chapter">印は、波形<span class="ten">。</span></h2>
+      <div class="specimens">
+        <div class="specimen">
+          <div class="specimen-name">
+            <h4>集中</h4>
+            <span>BETA — FOCUS</span>
+          </div>
+          <div class="specimen-wave">
+            <svg id="w-beta" viewBox="0 0 860 64" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+            <p class="spec-label"><span>β 18.4 Hz</span><i>／</i><span>細かく、速い</span></p>
+          </div>
+        </div>
+        <div class="specimen">
+          <div class="specimen-name">
+            <h4>安静</h4>
+            <span>ALPHA — REST</span>
+          </div>
+          <div class="specimen-wave">
+            <svg id="w-alpha" viewBox="0 0 860 64" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+            <p class="spec-label"><span>α 9.8 Hz</span><i>／</i><span>ゆったり、律動</span></p>
+          </div>
+        </div>
+        <div class="specimen">
+          <div class="specimen-name">
+            <h4>まどろみ</h4>
+            <span>THETA — DROWSY</span>
+          </div>
+          <div class="specimen-wave">
+            <svg id="w-theta" viewBox="0 0 860 64" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+            <p class="spec-label"><span>θ 5.2 Hz</span><i>／</i><span>大きく、遅い</span></p>
+          </div>
+        </div>
+      </div>
+      <p class="note specimen-rule">
+        状態によって波の顔つきが変わる——だからアイデンティティは無限にあり、どれも本物である。
+        使用時は必ず標本ラベル（帯域・日時・ひとことの状況）を添える。ラベルのない波形は使用禁止。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 04 色 ============ -->
+  <section class="page">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>04 — COLOR</span></div>
+      <h2 class="chapter">色<span class="ten">。</span></h2>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background: var(--paper);"></div>
+          <h4>紙</h4><span class="code">#F7F4EE</span>
+          <p class="use">凪の地面。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: var(--paper-deep);"></div>
+          <h4>濃い紙</h4><span class="code">#EFEADF</span>
+          <p class="use">面の切替。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: var(--sumi);"></div>
+          <h4>墨</h4><span class="code">#221F1A</span>
+          <p class="use">文字。製品。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: var(--usugrey);"></div>
+          <h4>淡灰</h4><span class="code">#C4BEAE</span>
+          <p class="use">罫線。紙上の波。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip chip--ten"></div>
+          <h4>点</h4><span class="code">#E2561F</span>
+          <p class="use">気づきの一点。句点。LED。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip chip--phos"></div>
+          <h4>燐光</h4><span class="code">#37FFA5</span>
+          <p class="use">信号状態の波、専用。</p>
+        </div>
+      </div>
+      <div class="color-rules">
+        <div class="color-rule">
+          <h4>点の掟</h4>
+          <p>オレンジは全体の1%。点・句点・LED・強調の数文字。面で塗った時点で、このブランドではなくなる。</p>
+        </div>
+        <div class="color-rule">
+          <h4>燐光の掟</h4>
+          <p>燐光は墨の上でしか光らない。紙の上には決して置かない——蓄光塗料が暗闇でだけ光るように。用途は実測波形の描画のみ。文字や飾りには使わない。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 文字 ============ -->
+  <section class="page">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>05 — TYPOGRAPHY</span></div>
+      <h2 class="chapter">文字<span class="ten">。</span></h2>
+      <div class="type-rows">
+        <div class="type-row">
+          <div class="type-role"><h4>声 — 明朝</h4><span>SHIPPORI MINCHO</span></div>
+          <p class="spec-mincho">まだ知らない自分を、知る<span class="ten">。</span></p>
+        </div>
+        <div class="type-row">
+          <div class="type-role"><h4>情報 — ゴシック</h4><span>NOTO SANS JP</span></div>
+          <p class="spec-sans">本文・説明・UIラベル。声（明朝）が語り、ゴシックが支える。ウェイトは300〜500のみ。太字で叫ばない。</p>
+        </div>
+        <div class="type-row">
+          <div class="type-role"><h4>数値・英字</h4><span>INTER</span></div>
+          <p class="spec-en-type">α 9.8 Hz — 06:12:44 — 12.4 μV
+            <small>計測値は等幅数字で、正確に、静かに。</small>
+          </p>
+        </div>
+        <div class="type-row">
+          <div class="type-role"><h4>句点の点</h4><span>THE ORANGE FULL STOP</span></div>
+          <p class="spec-sans">見出しの文末の句点「<span class="ten">。</span>」は、常にオレンジ。文の終わりに、気づきの点がひとつ灯る。線上の点、製品のLED、句点——すべて同じ「点」である。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 製品（信号） ============ -->
+  <section class="page page--ink">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>06 — PRODUCT</span></div>
+      <h2 class="chapter">製品は、計器<span class="ten">。</span></h2>
+      <div class="blueprint">
+        <div class="blueprint-figure">
+          <svg viewBox="0 0 660 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HUSH 図面（イメージ）">
+            <!-- graticule基準線 -->
+            <line x1="40" y1="380" x2="520" y2="380" stroke="rgba(247,244,238,0.18)" stroke-width="1"/>
+            <line x1="40" y1="374" x2="40" y2="386" stroke="rgba(247,244,238,0.18)" stroke-width="1"/>
+            <line x1="520" y1="374" x2="520" y2="386" stroke="rgba(247,244,238,0.18)" stroke-width="1"/>
+            <text x="272" y="404" fill="rgba(247,244,238,0.3)" font-family="Inter, sans-serif" font-size="10" letter-spacing="3" text-anchor="middle">34 mm</text>
+
+            <!-- 本体アウトライン（耳掛け型・イメージ） -->
+            <path d="M180 90 Q300 40 360 110 Q410 170 385 240 Q362 300 300 318 Q240 334 205 292 Q172 252 172 196 Q172 130 180 90 Z"
+                  stroke="#f7f4ee" stroke-width="1.5" fill="none"/>
+            <path d="M215 120 Q295 85 335 135 Q368 180 350 230 Q332 276 285 288"
+                  stroke="rgba(247,244,238,0.35)" stroke-width="1" fill="none" stroke-dasharray="3 5"/>
+            <!-- 電極 -->
+            <circle cx="255" cy="230" r="34" stroke="#f7f4ee" stroke-width="1.2" fill="none"/>
+            <circle cx="255" cy="230" r="22" stroke="rgba(247,244,238,0.4)" stroke-width="1" fill="none"/>
+            <!-- LED（点） -->
+            <circle cx="352" cy="128" r="4" fill="#e2561f"/>
+
+            <!-- 引き出し線：電極 -->
+            <line x1="255" y1="230" x2="120" y2="230" stroke="rgba(55,255,165,0.5)" stroke-width="1"/>
+            <circle cx="255" cy="230" r="2.4" fill="#37ffa5"/>
+            <text x="112" y="224" fill="#37ffa5" font-family="Inter, sans-serif" font-size="11" letter-spacing="2" text-anchor="end">DRY ELECTRODE ×3</text>
+            <text x="112" y="240" fill="rgba(55,255,165,0.5)" font-family="sans-serif" font-size="10" letter-spacing="2" text-anchor="end">乾式電極</text>
+
+            <!-- 引き出し線：LED -->
+            <line x1="352" y1="128" x2="470" y2="80" stroke="rgba(55,255,165,0.5)" stroke-width="1"/>
+            <text x="476" y="76" fill="#37ffa5" font-family="Inter, sans-serif" font-size="11" letter-spacing="2">LED — 点</text>
+            <text x="476" y="92" fill="rgba(55,255,165,0.5)" font-family="sans-serif" font-size="10" letter-spacing="2">呼吸のリズムで明滅</text>
+
+            <!-- 引き出し線：外装 -->
+            <line x1="368" y1="260" x2="470" y2="300" stroke="rgba(55,255,165,0.5)" stroke-width="1"/>
+            <circle cx="368" cy="260" r="2.4" fill="#37ffa5"/>
+            <text x="476" y="298" fill="#37ffa5" font-family="Inter, sans-serif" font-size="11" letter-spacing="2">MATTE SHELL</text>
+            <text x="476" y="314" fill="rgba(55,255,165,0.5)" font-family="sans-serif" font-size="10" letter-spacing="2">墨／生成り・つや消し</text>
+          </svg>
+        </div>
+        <div class="bp-rules">
+          <div class="bp-rule">
+            <h4>道具であって、ガジェットではない</h4>
+            <p>墨と生成りの2色、マット仕上げ。光沢・メッキ・電飾は使わない。肌と生活に馴染む（meld）ことが最優先。</p>
+            <div class="cw-chips">
+              <div class="cw-chip"><i style="background:#2b2823;"></i><span>SUMI</span></div>
+              <div class="cw-chip"><i style="background:#ede7da;"></i><span>KINARI</span></div>
+            </div>
+          </div>
+          <div class="bp-rule">
+            <h4>点は、ここに宿る</h4>
+            <p>オレンジのLEDがひとつ。計測中は呼吸のリズムでゆっくり明滅する。ブランドの「点」が物理世界に現れる唯一の場所。眩しくしない。</p>
+          </div>
+          <div class="bp-rule">
+            <h4>音は、置いていく</h4>
+            <p>起動音・通知音は原則なし。アプリの結論は短い言葉で——「いま、集中が深い。」機械が語りすぎない。</p>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="margin-top: 32px;">※ 形状はイメージ。工業デザイン確定時に、この原則（2色マット・点のLED・無音）を適用する。</p>
+    </div>
+  </section>
+
+  <!-- ============ 07 言葉（凪） ============ -->
+  <section class="page">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>07 — VOICE</span></div>
+      <h2 class="chapter">言葉<span class="ten">。</span></h2>
+      <div class="voice-grid">
+        <div class="voice-col">
+          <h4>USE — 使う言葉</h4>
+          <ul>
+            <li>知る、気づく</li>
+            <li>静けさ、凪、信号</li>
+            <li>日常、そば、寄り添う</li>
+            <li>溶け込む、馴染む</li>
+            <li>本物、実測、記録</li>
+          </ul>
+        </div>
+        <div class="voice-col voice-col--avoid">
+          <h4>AVOID — 使わない言葉</h4>
+          <ul>
+            <li>ハックする、最適化しまくる</li>
+            <li>最強、最先端、革命</li>
+            <li>爆速、圧倒的</li>
+            <li>脳を支配、コントロール</li>
+            <li>！！（感嘆符）——文は句点で終える</li>
+          </ul>
+        </div>
+      </div>
+      <div class="voice-example">
+        <p class="before">脳波データで集中力を徹底的に可視化！パフォーマンスを最大化する次世代デバイス！</p>
+        <p class="after">あなたの集中は、あなたが思うより静かに始まっている<span class="ten">。</span><br>HUSHは、それを知っている<span class="ten">。</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 08 展開（凪） ============ -->
+  <section class="page">
+    <div class="page-inner">
+      <div class="running"><span>MELDWORKS — BRAND CODE</span><span>08 — APPLICATIONS</span></div>
+      <h2 class="chapter">展開<span class="ten">。</span></h2>
+      <div class="apps">
+        <div class="app">
+          <div class="app-mock">
+            <div class="meishi">
+              <div class="m-top">
+                <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sumi);">
+                  <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="16"/>
+                  <circle cx="162" cy="170" r="12" fill="currentColor"/>
+                  <circle cx="143" cy="285" r="26" fill="currentColor"/>
+                  <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+                  <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+                  <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+                </svg>
+                <span>meldworks</span>
+              </div>
+              <p class="m-name">林 裕也</p>
+              <p class="m-role">CEO — MELDWORKS CO., LTD.</p>
+              <svg class="m-wave" id="w-meishi" viewBox="0 0 260 26" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+              <p class="m-spec">β 18.4 Hz — 2026.06.30 — 本人の脳波</p>
+            </div>
+          </div>
+          <span class="app-label">名刺 — 全員、自分の波が刷られる</span>
+        </div>
+
+        <div class="app">
+          <div class="app-mock app-mock--ink">
+            <div class="phone">
+              <div class="p-head"><span>HUSH</span><span class="rec">● REC</span></div>
+              <p class="p-state">いま、集中が<br>深い<span class="ten">。</span></p>
+              <p class="p-sub">14:00 から 42分</p>
+              <svg id="w-phone" viewBox="0 0 160 44" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+              <div class="p-foot"><span>β 18.4 Hz</span><span>12.4 μV</span></div>
+            </div>
+          </div>
+          <span class="app-label">アプリ — 計測中だけ「信号」状態になる</span>
+        </div>
+
+        <div class="app">
+          <div class="app-mock">
+            <div class="hero-mock">
+              <p class="h-brand">meldworks</p>
+              <p class="h-title">感覚に頼る時代は、<br>終わる<span class="ten">。</span></p>
+              <svg id="w-hero" viewBox="0 0 320 36" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+              <p class="h-spec">α 9.8 Hz — TODAY 06:12 — <b>これは、代表の今朝の脳波。</b></p>
+            </div>
+          </div>
+          <span class="app-label">ウェブ — ヒーローの波は毎朝更新される実データ</span>
+        </div>
+
+        <div class="app">
+          <div class="app-mock" style="background: var(--paper-deep);">
+            <div class="box">
+              <span class="b-word">HUSH</span>
+              <svg id="w-box" viewBox="0 0 140 30" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+              <span class="b-tag">まだ知らない自分を知る。</span>
+            </div>
+          </div>
+          <span class="app-label">パッケージ — 墨の箱に、燐光の波</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 裏表紙（信号） ============ -->
+  <footer class="page page--ink backcover">
+    <div class="page-inner">
+      <svg class="bc-logo" viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="10"/>
+        <circle cx="162" cy="170" r="9" fill="currentColor"/>
+        <circle cx="143" cy="285" r="22" fill="currentColor"/>
+        <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+        <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+        <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+      </svg>
+      <p class="bc-tag">まだ知らない自分を知る<span class="ten">。</span></p>
+      <svg class="bc-wave" id="w-back" viewBox="0 0 520 60" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+      <p class="bc-foot">MELDWORKS — QUIET TECHNOLOGY — BRAND CODE v2</p>
+    </div>
+  </footer>
+
+  <script>
+    /* ============================================================
+       擬似脳波ジェネレータ
+       実波形の特性（帯域・律動・ゆらぎ）に合わせて合成する。
+       シード固定＝再現可能（標本として毎回同じ波を描く）。
+       ============================================================ */
+    function mulberry32(seed) {
+      return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    /* profile: alpha/beta/theta の振幅、noise、ゆらぎ速度 */
+    function makeEEG(seed, p) {
+      const rnd = mulberry32(seed);
+      const ph = Array.from({ length: 12 }, () => rnd() * Math.PI * 2);
+      const nf = Array.from({ length: 5 }, () => 0.7 + rnd() * 6);
+      return function (t) {
+        let v = 0;
+        // α：紡錘状に満ち引きする律動
+        const spindle = 0.45 + 0.55 * Math.max(0, Math.sin(2 * Math.PI * 0.22 * t + ph[0]));
+        v += Math.sin(2 * Math.PI * 9.8 * t + ph[1]) * (p.alpha || 0) * spindle;
+        // β：細かく速い
+        v += Math.sin(2 * Math.PI * 18.4 * t + ph[2]) * (p.beta || 0)
+           + Math.sin(2 * Math.PI * 23.1 * t + ph[3]) * (p.beta || 0) * 0.5;
+        // θ：大きくゆっくり
+        v += Math.sin(2 * Math.PI * 5.2 * t + ph[4]) * (p.theta || 0)
+           + Math.sin(2 * Math.PI * 3.4 * t + ph[5]) * (p.theta || 0) * 0.6;
+        // 生体ノイズ（非整数周波数の重ね合わせ）
+        let n = 0;
+        for (let i = 0; i < 5; i++) n += Math.sin(2 * Math.PI * nf[i] * t * 3.7 + ph[6 + i]);
+        v += n * (p.noise || 0) * 0.2;
+        return v;
+      };
+    }
+
+    /* SVGへ描画（duration秒ぶんの波形を width に収める） */
+    function drawWave(id, seed, profile, opts) {
+      const svg = document.getElementById(id);
+      if (!svg) return;
+      const [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
+      const o = Object.assign({ dur: 6, color: '#c4beae', width: 1.2, glow: false, pad: 0 }, opts || {});
+      const eeg = makeEEG(seed, profile);
+      const mid = H / 2;
+      const scale = (H / 2 - 2 - o.pad) / 1.9;
+      const pts = [];
+      const N = Math.min(1400, Math.round(W * 1.6));
+      for (let i = 0; i <= N; i++) {
+        const x = (i / N) * W;
+        const t = (i / N) * o.dur;
+        const y = mid - eeg(t) * scale;
+        pts.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(2)}`);
+      }
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pts.join(''));
+      path.setAttribute('stroke', o.color);
+      path.setAttribute('stroke-width', o.width);
+      path.setAttribute('fill', 'none');
+      if (o.glow) path.classList.add('ph');
+      svg.appendChild(path);
+    }
+
+    const SUMI = '#5d574a';
+    const GREY = '#c4beae';
+    const PHOS = '#37ffa5';
+
+    /* 表紙：α（起床、静か） */
+    drawWave('w-cover', 11, { alpha: 1.0, beta: 0.12, noise: 0.3 }, { dur: 5, color: SUMI, width: 1 });
+
+    /* 間奏：β（集中）— 黒に燐光、大きく */
+    drawWave('w-scope', 47, { alpha: 0.35, beta: 0.9, noise: 0.5 }, { dur: 7, color: PHOS, width: 1.4, glow: true });
+
+    /* 状態：凪＝ほぼ平らな線／信号＝燐光の波 */
+    drawWave('w-nagi', 5, { alpha: 0.1, noise: 0.12 }, { dur: 5, color: GREY, width: 1 });
+    drawWave('w-shingo', 29, { alpha: 0.7, beta: 0.5, noise: 0.4 }, { dur: 5, color: PHOS, width: 1.2, glow: true });
+
+    /* 標本：β／α／θ */
+    drawWave('w-beta', 83, { alpha: 0.2, beta: 1.0, noise: 0.5 }, { dur: 6, color: SUMI, width: 1 });
+    drawWave('w-alpha', 61, { alpha: 1.1, beta: 0.1, noise: 0.25 }, { dur: 6, color: SUMI, width: 1 });
+    drawWave('w-theta', 37, { theta: 1.1, alpha: 0.15, noise: 0.3 }, { dur: 6, color: SUMI, width: 1 });
+
+    /* 展開モック */
+    drawWave('w-meishi', 47, { alpha: 0.3, beta: 0.9, noise: 0.45 }, { dur: 4, color: SUMI, width: 0.8 });
+    drawWave('w-phone', 47, { alpha: 0.3, beta: 0.9, noise: 0.45 }, { dur: 3, color: PHOS, width: 1, glow: true });
+    drawWave('w-hero', 11, { alpha: 1.0, beta: 0.12, noise: 0.3 }, { dur: 4, color: SUMI, width: 0.9 });
+    drawWave('w-box', 29, { alpha: 0.8, beta: 0.3, noise: 0.3 }, { dur: 3, color: PHOS, width: 1, glow: true });
+
+    /* 裏表紙：波が凪いで、点へ */
+    (function () {
+      const svg = document.getElementById('w-back');
+      const eeg = makeEEG(61, { alpha: 1.0, beta: 0.3, noise: 0.35 });
+      const W = 520, H = 60, mid = H / 2;
+      const pts = [];
+      for (let i = 0; i <= 800; i++) {
+        const x = (i / 800) * (W - 30);
+        const k = i / 800;
+        const decay = Math.pow(1 - k, 1.6);
+        const y = mid - eeg(k * 5) * 12 * decay;
+        pts.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(2)}`);
+      }
+      pts.push(`L${W - 22},${mid}`);
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pts.join(''));
+      path.setAttribute('stroke', PHOS);
+      path.setAttribute('stroke-width', 1.2);
+      path.setAttribute('fill', 'none');
+      path.classList.add('ph');
+      svg.appendChild(path);
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', W - 12);
+      dot.setAttribute('cy', mid);
+      dot.setAttribute('r', 3.4);
+      dot.setAttribute('fill', '#e2561f');
+      svg.appendChild(dot);
+    })();
+  </script>
+</body>
+</html>

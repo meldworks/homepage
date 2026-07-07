@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>meldworks — ブランドボード「静かな技術」</title>
+  <meta name="robots" content="noindex">
+
+  <!--
+    ============================================================
+    meldworks ブランドボード v1
+    ブランドの核・視覚言語・言葉のトーンを一望する社内資料。
+    このボード自体がブランドの見本となるように作られている。
+    ============================================================
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper:      #f7f4ee;
+      --paper-deep: #efeadf;
+      --sumi:       #221f1a;
+      --sumi-soft:  #6e695e;
+      --sumi-faint: #a09a8c;
+      --usugrey:    #c4beae;
+      --hi:         #e2561f;
+
+      --mincho: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      --sans:   'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      --en:     'Inter', sans-serif;
+
+      --pad-x: clamp(28px, 6vw, 96px);
+      --hairline: 1px solid rgba(34, 31, 26, 0.14);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--paper);
+      color: var(--sumi);
+      font-family: var(--sans);
+      font-weight: 400;
+      line-height: 2;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.13 0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .board {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 var(--pad-x);
+    }
+
+    /* ── 共通 ── */
+    .sec {
+      padding: clamp(64px, 8vw, 110px) 0;
+      border-bottom: var(--hairline);
+    }
+    .sec:last-child { border-bottom: none; }
+
+    .sec-no {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      color: var(--sumi-faint);
+      display: block;
+      margin-bottom: 10px;
+    }
+    .sec-name {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+      letter-spacing: 0.16em;
+      margin-bottom: clamp(32px, 4vw, 56px);
+    }
+    .note {
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       表紙
+       ============================================================ */
+    .cover {
+      padding: clamp(80px, 10vw, 140px) 0 clamp(64px, 8vw, 100px);
+      border-bottom: var(--hairline);
+    }
+    .cover-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: clamp(72px, 10vw, 130px);
+    }
+    .brand-mark { display: flex; align-items: center; gap: 12px; }
+    .brand-mark svg { width: 30px; height: 30px; }
+    .brand-mark span {
+      font-family: var(--en);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+    .cover-meta {
+      font-family: var(--en);
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      color: var(--sumi-faint);
+      text-align: right;
+      line-height: 1.9;
+    }
+    .cover-title {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(2.4rem, 6vw, 4.6rem);
+      letter-spacing: 0.12em;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+    .cover-title .dot { color: var(--hi); }
+    .cover-lead {
+      max-width: 620px;
+      font-size: 0.86rem;
+      letter-spacing: 0.1em;
+      line-height: 2.5;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       01 エッセンス
+       ============================================================ */
+    .essence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(28px, 4vw, 56px);
+      margin-top: 8px;
+    }
+    .essence h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.3rem;
+      letter-spacing: 0.2em;
+      margin-bottom: 6px;
+    }
+    .essence .en {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.32em;
+      color: var(--sumi-faint);
+      display: block;
+      margin-bottom: 16px;
+    }
+    .essence p {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+    }
+    .name-story {
+      margin-top: clamp(40px, 5vw, 64px);
+      padding: clamp(24px, 3vw, 40px);
+      background: var(--paper-deep);
+      display: flex;
+      gap: clamp(20px, 3vw, 40px);
+      align-items: baseline;
+    }
+    .name-story b {
+      font-family: var(--en);
+      font-weight: 500;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+    .name-story p {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       02 ロゴ
+       ============================================================ */
+    .logo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 36px);
+    }
+    .logo-tile {
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: var(--hairline);
+    }
+    .logo-tile svg { width: clamp(72px, 9vw, 110px); height: auto; }
+    .logo-tile--sumi { background: var(--sumi); border-color: var(--sumi); }
+    .logo-caption {
+      margin-top: 12px;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      color: var(--sumi-faint);
+    }
+    .logo-note { margin-top: 28px; max-width: 640px; }
+
+    /* ============================================================
+       03 カラー
+       ============================================================ */
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: clamp(14px, 2vw, 24px);
+      margin-bottom: clamp(36px, 5vw, 56px);
+    }
+    .swatch .chip {
+      aspect-ratio: 1 / 1.1;
+      border: var(--hairline);
+      position: relative;
+    }
+    .swatch .chip.hi-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--paper);
+    }
+    .swatch .chip.hi-chip::after {
+      content: '';
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--hi);
+    }
+    .swatch h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      margin-top: 14px;
+    }
+    .swatch .code {
+      font-family: var(--en);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      color: var(--sumi-faint);
+      display: block;
+      margin-top: 2px;
+    }
+    .swatch .use {
+      font-size: 0.7rem;
+      color: var(--sumi-soft);
+      letter-spacing: 0.06em;
+      line-height: 1.9;
+      margin-top: 6px;
+    }
+
+    .ratio {
+      display: flex;
+      height: 34px;
+      border: var(--hairline);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .ratio i { display: block; height: 100%; }
+
+    /* ============================================================
+       04 タイポグラフィ
+       ============================================================ */
+    .type-rows { display: flex; flex-direction: column; }
+    .type-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: clamp(20px, 4vw, 56px);
+      padding: clamp(28px, 3.6vw, 44px) 0;
+      border-bottom: var(--hairline);
+      align-items: baseline;
+    }
+    .type-row:last-child { border-bottom: none; }
+    .type-role h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.92rem;
+      letter-spacing: 0.18em;
+      margin-bottom: 4px;
+    }
+    .type-role span {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      color: var(--sumi-faint);
+    }
+    .spec-mincho {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+    }
+    .spec-sans {
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+    }
+    .spec-en {
+      font-family: var(--en);
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      letter-spacing: 0.06em;
+      color: var(--sumi);
+    }
+    .spec-en small {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: var(--sumi-faint);
+      margin-top: 8px;
+    }
+
+    /* ============================================================
+       05 モチーフ
+       ============================================================ */
+    .motif-figure {
+      border: var(--hairline);
+      padding: clamp(28px, 4vw, 48px) clamp(20px, 3vw, 40px);
+      margin-bottom: 20px;
+    }
+    .motif-figure svg { width: 100%; height: auto; display: block; }
+    .motif-caption {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      color: var(--sumi-faint);
+      margin-top: 16px;
+    }
+    .motif-rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(20px, 3vw, 40px);
+      margin-top: 36px;
+    }
+    .motif-rules h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.16em;
+      margin-bottom: 8px;
+    }
+    .motif-rules p {
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      line-height: 2.2;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       06 プロダクト
+       ============================================================ */
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 36px);
+      margin-bottom: 36px;
+    }
+    .colorway {
+      border: var(--hairline);
+      padding: clamp(28px, 4vw, 48px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .colorway--sumi { background: #2b2823; border-color: #2b2823; }
+    .colorway svg { width: clamp(120px, 16vw, 180px); height: auto; }
+    .colorway .cw-name {
+      font-family: var(--mincho);
+      font-size: 0.82rem;
+      letter-spacing: 0.3em;
+    }
+    .colorway--sumi .cw-name { color: var(--paper); }
+    .cw-en {
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      color: var(--sumi-faint);
+    }
+    .product-rules {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(20px, 3vw, 40px);
+    }
+    .product-rules h4 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.16em;
+      margin-bottom: 8px;
+    }
+    .product-rules p {
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      line-height: 2.2;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       07 言葉のトーン
+       ============================================================ */
+    .tone-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 36px);
+      margin-bottom: 40px;
+    }
+    .tone-col {
+      border: var(--hairline);
+      padding: clamp(24px, 3vw, 40px);
+    }
+    .tone-col h4 {
+      font-family: var(--en);
+      font-size: 0.62rem;
+      letter-spacing: 0.32em;
+      color: var(--sumi-faint);
+      margin-bottom: 20px;
+    }
+    .tone-col ul { list-style: none; }
+    .tone-col li {
+      font-size: 0.84rem;
+      letter-spacing: 0.1em;
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(34, 31, 26, 0.12);
+    }
+    .tone-col li:last-child { border-bottom: none; }
+    .tone-col--avoid li {
+      color: var(--sumi-faint);
+      text-decoration: line-through;
+      text-decoration-color: rgba(34, 31, 26, 0.3);
+      text-decoration-thickness: 1px;
+    }
+    .tone-example {
+      border-left: 2px solid var(--hi);
+      padding: 6px 0 6px clamp(20px, 3vw, 32px);
+    }
+    .tone-example .before {
+      font-size: 0.8rem;
+      color: var(--sumi-faint);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+      margin-bottom: 10px;
+      letter-spacing: 0.08em;
+    }
+    .tone-example .after {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      letter-spacing: 0.14em;
+    }
+
+    /* ============================================================
+       08 展開イメージ
+       ============================================================ */
+    .apps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(20px, 3vw, 36px);
+      align-items: stretch;
+    }
+    .app-tile { display: flex; flex-direction: column; gap: 14px; }
+    .app-mock {
+      flex: 1;
+      border: var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(24px, 3vw, 40px);
+      min-height: 260px;
+    }
+    .app-label {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      color: var(--sumi-faint);
+    }
+
+    /* 名刺 */
+    .card-mock {
+      width: 100%;
+      max-width: 230px;
+      aspect-ratio: 91/55;
+      background: var(--paper);
+      border: var(--hairline);
+      box-shadow: 6px 6px 0 rgba(34, 31, 26, 0.06);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-mock .cm-top { display: flex; align-items: center; gap: 6px; }
+    .card-mock .cm-top svg { width: 14px; height: 14px; }
+    .card-mock .cm-top span {
+      font-family: var(--en);
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+    .card-mock .cm-name {
+      font-family: var(--mincho);
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+    }
+    .card-mock .cm-name small {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      color: var(--sumi-faint);
+      margin-top: 2px;
+    }
+
+    /* アプリ画面 */
+    .phone-mock {
+      width: 100%;
+      max-width: 170px;
+      aspect-ratio: 9/17;
+      background: var(--paper);
+      border: 1.5px solid rgba(34, 31, 26, 0.5);
+      border-radius: 22px;
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-mock .pm-label {
+      font-family: var(--en);
+      font-size: 0.5rem;
+      letter-spacing: 0.3em;
+      color: var(--sumi-faint);
+      margin-bottom: 14px;
+    }
+    .phone-mock .pm-state {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      line-height: 1.9;
+      margin-bottom: 4px;
+    }
+    .phone-mock .pm-sub {
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      color: var(--sumi-soft);
+      margin-bottom: auto;
+    }
+    .phone-mock svg { width: 100%; height: auto; }
+    .phone-mock .pm-foot {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.48rem;
+      letter-spacing: 0.2em;
+      color: var(--sumi-faint);
+      margin-top: 10px;
+    }
+
+    /* パッケージ */
+    .box-mock {
+      width: 100%;
+      max-width: 190px;
+      aspect-ratio: 1/1.05;
+      background: var(--paper);
+      border: var(--hairline);
+      box-shadow: 8px 8px 0 rgba(34, 31, 26, 0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 20px;
+    }
+    .box-mock .bm-word {
+      font-family: var(--en);
+      font-weight: 500;
+      font-size: 1.15rem;
+      letter-spacing: 0.5em;
+      padding-left: 0.5em;
+    }
+    .box-mock .bm-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--hi);
+    }
+    .box-mock .bm-tag {
+      font-family: var(--mincho);
+      font-size: 0.55rem;
+      letter-spacing: 0.26em;
+      color: var(--sumi-soft);
+    }
+
+    /* ── フッター ── */
+    .board-foot {
+      padding: 48px 0 56px;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.24em;
+      color: var(--sumi-faint);
+    }
+
+    /* ── レスポンシブ ── */
+    @media (max-width: 820px) {
+      .essence-grid { grid-template-columns: 1fr; }
+      .logo-grid { grid-template-columns: 1fr; }
+      .swatches { grid-template-columns: repeat(2, 1fr); }
+      .type-row { grid-template-columns: 1fr; gap: 10px; }
+      .product-grid { grid-template-columns: 1fr; }
+      .motif-rules, .product-rules { grid-template-columns: 1fr; }
+      .tone-grid { grid-template-columns: 1fr; }
+      .apps { grid-template-columns: 1fr; }
+      .name-story { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="board">
+
+    <!-- ============ 表紙 ============ -->
+    <header class="cover">
+      <div class="cover-head">
+        <div class="brand-mark">
+          <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="meldworks logo">
+            <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="14"/>
+            <circle cx="162" cy="170" r="10" fill="currentColor"/>
+            <circle cx="143" cy="285" r="24" fill="currentColor"/>
+            <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+          </svg>
+          <span>meldworks</span>
+        </div>
+        <div class="cover-meta">
+          BRAND BOARD — v1<br>
+          2026
+        </div>
+      </div>
+      <h1 class="cover-title">静かな技術<span class="dot">。</span></h1>
+      <p class="cover-lead">
+        騒がず、日常に溶け込み、内面を静かに照らす。<br>
+        メルドワークスのすべてのデザイン——製品、ウェブ、資料、言葉——は、
+        この一つの考えから導かれる。
+      </p>
+    </header>
+
+    <!-- ============ 01 エッセンス ============ -->
+    <section class="sec">
+      <span class="sec-no">01 — ESSENCE</span>
+      <h2 class="sec-name">ブランドの核</h2>
+      <div class="essence-grid">
+        <div class="essence">
+          <h3>静けさ</h3>
+          <span class="en">CALM</span>
+          <p>技術が前に出ない。データで騒がない。急かさない。製品名 HUSH が示す通り、静けさはこのブランドの第一言語。</p>
+        </div>
+        <div class="essence">
+          <h3>誠実</h3>
+          <span class="en">HONEST</span>
+          <p>脳を扱う会社だからこそ、科学的な謙虚さを保つ。言い切りすぎない。できないことを盛らない。それが信頼になる。</p>
+        </div>
+        <div class="essence">
+          <h3>溶け込む</h3>
+          <span class="en">MELD</span>
+          <p>実験室の装置を、毎日の道具に。デバイスは肌に、データは生活に、ブランドは日常に馴染む。</p>
+        </div>
+      </div>
+      <div class="name-story">
+        <b>meld = 溶け合う</b>
+        <p>社名はブランドの起点。「脳波という特別な技術が、日常に溶け込む（meld）」——社名・製品名・ロゴ・タグラインは、すでに一つの物語を語っている。</p>
+      </div>
+    </section>
+
+    <!-- ============ 02 ロゴ ============ -->
+    <section class="sec">
+      <span class="sec-no">02 — LOGO</span>
+      <h2 class="sec-name">ロゴ</h2>
+      <div class="logo-grid">
+        <div>
+          <div class="logo-tile">
+            <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sumi);">
+              <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="8"/>
+              <circle cx="162" cy="170" r="8" fill="currentColor"/>
+              <circle cx="143" cy="285" r="21" fill="currentColor"/>
+              <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+              <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+              <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="logo-caption">ON PAPER — 基本</p>
+        </div>
+        <div>
+          <div class="logo-tile logo-tile--sumi">
+            <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--paper);">
+              <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="8"/>
+              <circle cx="162" cy="170" r="8" fill="currentColor"/>
+              <circle cx="143" cy="285" r="21" fill="currentColor"/>
+              <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+              <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+              <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="logo-caption">ON SUMI — 反転</p>
+        </div>
+      </div>
+      <p class="note logo-note">
+        円は「内面」、点は「信号の源」、外へ伸びる線は「内なる信号が世界へ届くこと」。
+        ロゴはすでに「静かな技術」を語っているため、変更しない。
+        墨・紙の2色のみで使用し、着色や装飾を加えない。
+      </p>
+    </section>
+
+    <!-- ============ 03 カラー ============ -->
+    <section class="sec">
+      <span class="sec-no">03 — COLOR</span>
+      <h2 class="sec-name">カラー</h2>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="chip" style="background: var(--paper);"></div>
+          <h4>紙</h4>
+          <span class="code">#F7F4EE</span>
+          <p class="use">土台。画面と紙面の背景。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: var(--paper-deep);"></div>
+          <h4>濃い紙</h4>
+          <span class="code">#EFEADF</span>
+          <p class="use">面の切り替え、静かな強調。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: var(--sumi);"></div>
+          <h4>墨</h4>
+          <span class="code">#221F1A</span>
+          <p class="use">文字。製品の基本色。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: var(--usugrey);"></div>
+          <h4>淡灰</h4>
+          <span class="code">#C4BEAE</span>
+          <p class="use">罫線、満ちる前の文字、波形。</p>
+        </div>
+        <div class="swatch">
+          <div class="chip hi-chip"></div>
+          <h4>シグナル</h4>
+          <span class="code">#E2561F</span>
+          <p class="use">気づきの一点。面で使わない。</p>
+        </div>
+      </div>
+      <div class="ratio" aria-hidden="true">
+        <i style="width: 62%; background: var(--paper);"></i>
+        <i style="width: 14%; background: var(--paper-deep);"></i>
+        <i style="width: 14%; background: var(--sumi);"></i>
+        <i style="width: 9%;  background: var(--usugrey);"></i>
+        <i style="width: 1%;  background: var(--hi);"></i>
+      </div>
+      <p class="note">
+        配分の目安。オレンジは全体の1%——LEDの点、線上の一点、強調語の数文字。
+        オレンジをボタンや帯など「面」で使った時点で、このブランドではなくなる。
+      </p>
+    </section>
+
+    <!-- ============ 04 タイポグラフィ ============ -->
+    <section class="sec">
+      <span class="sec-no">04 — TYPOGRAPHY</span>
+      <h2 class="sec-name">タイポグラフィ</h2>
+      <div class="type-rows">
+        <div class="type-row">
+          <div class="type-role">
+            <h4>声 — 明朝</h4>
+            <span>SHIPPORI MINCHO</span>
+          </div>
+          <p class="spec-mincho">まだ知らない自分を、知る。</p>
+        </div>
+        <div class="type-row">
+          <div class="type-role">
+            <h4>情報 — ゴシック</h4>
+            <span>NOTO SANS JP</span>
+          </div>
+          <p class="spec-sans">本文・説明・UIラベルに使う。声（明朝）が語り、ゴシックが支える。ウェイトは 300〜500 のみ。太字で叫ばない。</p>
+        </div>
+        <div class="type-row">
+          <div class="type-role">
+            <h4>数値・英字</h4>
+            <span>INTER</span>
+          </div>
+          <p class="spec-en">HUSH — 12.4 μV / alpha 9.8 Hz
+            <small>計測値・単位・英字ラベル。データは正確に、しかし静かに。</small>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 05 モチーフ ============ -->
+    <section class="sec">
+      <span class="sec-no">05 — MOTIF</span>
+      <h2 class="sec-name">モチーフ：一本の線と、点</h2>
+      <div class="motif-figure">
+        <svg id="motif-svg" viewBox="0 0 1000 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="波が凪いでいく一本の線">
+          <path id="motif-path" stroke="#c4beae" stroke-width="1.5" fill="none"/>
+          <circle cx="960" cy="60" r="4" fill="#e2561f"/>
+        </svg>
+        <div class="motif-caption"><span>SIGNAL</span><span>CALM</span></div>
+      </div>
+      <div class="motif-rules">
+        <div>
+          <h4>意味</h4>
+          <p>線は脳波＝内面の声。点は気づき。「騒がしい信号が、静けさと気づきに変わる」というプロダクトの約束そのもの。</p>
+        </div>
+        <div>
+          <h4>使い所</h4>
+          <p>登場は一場面に一度まで。ウェブならヒーローと製品シーン、資料なら表紙、製品ならLED。常に出しっぱなしにしない。</p>
+        </div>
+        <div>
+          <h4>動き</h4>
+          <p>動かすときは「波→凪」の方向だけ。ゆっくり、深いイージングで、一度にひとつ。跳ねない、点滅しない。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 06 プロダクト ============ -->
+    <section class="sec">
+      <span class="sec-no">06 — PRODUCT</span>
+      <h2 class="sec-name">プロダクトへの展開（HUSH）</h2>
+      <div class="product-grid">
+        <div class="colorway">
+          <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HUSH 墨カラー（イメージ）">
+            <path d="M60 30 Q130 10 150 60 Q165 100 130 122 Q95 144 70 120 Q45 96 48 62 Q50 40 60 30 Z" fill="#2b2823" stroke="#1c1a16" stroke-width="1.5"/>
+            <circle cx="88" cy="88" r="26" fill="#1c1a16"/>
+            <circle cx="88" cy="88" r="17" fill="#38342d"/>
+            <circle cx="141" cy="52" r="3.2" fill="#e2561f"/>
+          </svg>
+          <div>
+            <p class="cw-name" style="text-align:center;">墨</p>
+            <p class="cw-en" style="text-align:center;">SUMI — MATTE</p>
+          </div>
+        </div>
+        <div class="colorway colorway--sumi">
+          <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HUSH 生成りカラー（イメージ）">
+            <path d="M60 30 Q130 10 150 60 Q165 100 130 122 Q95 144 70 120 Q45 96 48 62 Q50 40 60 30 Z" fill="#ede7da" stroke="#d8d2c4" stroke-width="1.5"/>
+            <circle cx="88" cy="88" r="26" fill="#d8d2c4"/>
+            <circle cx="88" cy="88" r="17" fill="#f7f4ee"/>
+            <circle cx="141" cy="52" r="3.2" fill="#e2561f"/>
+          </svg>
+          <div>
+            <p class="cw-name" style="text-align:center;">生成り</p>
+            <p class="cw-en" style="text-align:center;">KINARI — MATTE</p>
+          </div>
+        </div>
+      </div>
+      <div class="product-rules">
+        <div>
+          <h4>色と質感</h4>
+          <p>墨と生成りの2色、マット仕上げ。ガジェットではなく道具として、肌と生活に馴染む（meld）。光沢とメッキは使わない。</p>
+        </div>
+        <div>
+          <h4>オレンジのLED</h4>
+          <p>ブランドの「点」が物理世界に現れる唯一の場所。計測中は呼吸のリズムでゆっくり明滅する。眩しくしない。</p>
+        </div>
+        <div>
+          <h4>音と通知</h4>
+          <p>起動音・通知音は原則なし。必要なときだけ、ごく小さく。アプリの結論は短い言葉で——「いま、集中が深い。」</p>
+        </div>
+      </div>
+      <p class="note" style="margin-top: 28px;">※ 形状はイメージ。工業デザイン確定時に、この色・質感・LEDの原則を適用する。</p>
+    </section>
+
+    <!-- ============ 07 言葉のトーン ============ -->
+    <section class="sec">
+      <span class="sec-no">07 — VOICE</span>
+      <h2 class="sec-name">言葉のトーン</h2>
+      <div class="tone-grid">
+        <div class="tone-col">
+          <h4>USE — 使う言葉</h4>
+          <ul>
+            <li>知る、気づく</li>
+            <li>静けさ、凪</li>
+            <li>日常、そば、寄り添う</li>
+            <li>溶け込む、馴染む</li>
+            <li>信号、声（内面の）</li>
+          </ul>
+        </div>
+        <div class="tone-col tone-col--avoid">
+          <h4>AVOID — 使わない言葉</h4>
+          <ul>
+            <li>ハックする、最適化しまくる</li>
+            <li>最強、最先端、革命</li>
+            <li>爆速、圧倒的</li>
+            <li>脳を支配、コントロール</li>
+            <li>！！（感嘆符の連打）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tone-example">
+        <p class="before">脳波データで集中力を徹底的に可視化！パフォーマンスを最大化する次世代デバイス！</p>
+        <p class="after">あなたの集中は、あなたが思うより静かに始まっている。HUSHは、それを知っている。</p>
+      </div>
+    </section>
+
+    <!-- ============ 08 展開イメージ ============ -->
+    <section class="sec">
+      <span class="sec-no">08 — APPLICATIONS</span>
+      <h2 class="sec-name">展開イメージ</h2>
+      <div class="apps">
+        <div class="app-tile">
+          <div class="app-mock">
+            <div class="card-mock">
+              <div class="cm-top">
+                <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--sumi);">
+                  <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="16"/>
+                  <circle cx="162" cy="170" r="12" fill="currentColor"/>
+                  <circle cx="143" cy="285" r="26" fill="currentColor"/>
+                  <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+                  <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+                  <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+                </svg>
+                <span>meldworks</span>
+              </div>
+              <div class="cm-name">
+                林 裕也
+                <small>CEO — MELDWORKS CO., LTD.</small>
+              </div>
+            </div>
+          </div>
+          <span class="app-label">名刺 — 紙と墨だけ</span>
+        </div>
+
+        <div class="app-tile">
+          <div class="app-mock">
+            <div class="phone-mock">
+              <p class="pm-label">HUSH</p>
+              <p class="pm-state">いま、集中が<br>深い。</p>
+              <p class="pm-sub">14:00 から 42分</p>
+              <svg viewBox="0 0 140 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 20 Q8 8 16 20 Q24 32 32 20 Q40 10 48 20 Q56 29 64 20 Q72 13 80 20 Q88 26 96 20 Q104 16 112 20 Q120 23 128 20 L140 20" stroke="#c4beae" stroke-width="1.2"/>
+                <circle cx="128" cy="20" r="2.4" fill="#e2561f"/>
+              </svg>
+              <div class="pm-foot"><span>ALPHA</span><span>9.8 Hz</span></div>
+            </div>
+          </div>
+          <span class="app-label">アプリ — 結論は短い言葉で</span>
+        </div>
+
+        <div class="app-tile">
+          <div class="app-mock" style="background: var(--paper-deep);">
+            <div class="box-mock">
+              <span class="bm-word">HUSH</span>
+              <span class="bm-dot"></span>
+              <span class="bm-tag">まだ知らない自分を知る。</span>
+            </div>
+          </div>
+          <span class="app-label">パッケージ — 紙の箱に、点ひとつ</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="board-foot">
+      <span>MELDWORKS — QUIET TECHNOLOGY</span>
+      <span>BRAND BOARD v1</span>
+    </footer>
+
+  </div>
+
+  <script>
+    /* モチーフの線：波（左）から凪（右）へ減衰するサイン波を描く */
+    (function () {
+      const pts = [];
+      const W = 1000, H = 120, mid = 60;
+      for (let x = 0; x <= 940; x += 4) {
+        const k = x / 940;                       // 0→1
+        const decay = Math.pow(1 - k, 1.8);      // 右へいくほど凪ぐ
+        const y = mid
+          + Math.sin(x * 0.05)  * 26 * decay
+          + Math.sin(x * 0.021) * 14 * decay;
+        pts.push(`${x === 0 ? 'M' : 'L'}${x},${y.toFixed(2)}`);
+      }
+      pts.push('L960,60');
+      document.getElementById('motif-path').setAttribute('d', pts.join(' '));
+    })();
+  </script>
+</body>
+</html>

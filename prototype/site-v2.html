@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>meldworks — サイト試作 v2（BRAND CODE準拠）</title>
+  <meta name="robots" content="noindex">
+
+  <!--
+    ============================================================
+    サイト試作 v2 — BRAND CODE「静かな技術。」準拠
+    本実装ではありません。現行サイトには影響しません。
+    ・凪（紙と墨）を基調に、「信号」の暗転シーンを一度だけ挟む
+    ・波形はすべて擬似脳波（実データ導入までの代替。特性は実波形準拠）
+    ・ニュースはダミーの静的表示
+    ============================================================
+  -->
+
+  <link rel="stylesheet" href="../fonts/fonts.css">
+
+  <style>
+    :root {
+      --paper:      #f7f4ee;
+      --paper-deep: #efeadf;
+      --sumi:       #221f1a;
+      --ink:        #12100c;
+      --sumi-soft:  #6e695e;
+      --sumi-faint: #a09a8c;
+      --usugrey:    #c4beae;
+      --ten:        #e2561f;
+      --phos:       #37ffa5;
+      --phos-dim:   rgba(55, 255, 165, 0.34);
+
+      --mincho: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      --sans:   'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      --en:     'Inter', sans-serif;
+
+      --ease-quiet: cubic-bezier(0.19, 1, 0.22, 1);
+      --pad-x: clamp(24px, 5vw, 72px);
+      --hairline: 1px solid rgba(34, 31, 26, 0.14);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--sumi);
+      font-family: var(--sans);
+      font-weight: 400;
+      line-height: 2;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    ::selection { background: rgba(226, 86, 31, 0.18); }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.13 0 0 0 0 0.12 0 0 0 0 0.10 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .ten { color: var(--ten); }
+
+    /* ============================================================
+       ヘッダー
+       ============================================================ */
+    .header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px var(--pad-x) 22px;
+      opacity: 0;
+      animation: quietFade 1.6s var(--ease-quiet) 1.4s forwards;
+      transition: background 0.6s, transform 0.6s;
+    }
+    .header.solid {
+      background: rgba(247, 244, 238, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    /* 信号シーン内ではヘッダーを隠す（暗転に集中） */
+    .header.hidden { transform: translateY(-110%); }
+
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--sumi); }
+    .brand svg { width: 26px; height: 26px; display: block; }
+    .brand span {
+      font-family: var(--en);
+      font-size: 1.02rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 2.6vw, 38px);
+      font-family: var(--en);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      color: var(--sumi-soft);
+    }
+    .nav a { transition: color 0.4s; }
+    .nav a:hover { color: var(--sumi); }
+    .nav .lang { color: var(--sumi-faint); }
+    .nav .lang b { color: var(--sumi); font-weight: 500; }
+
+    /* ============================================================
+       共通
+       ============================================================ */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 var(--pad-x);
+    }
+
+    .en-label {
+      display: inline-block;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.42em;
+      color: var(--sumi-faint);
+      margin-bottom: 28px;
+    }
+
+    .sec-title {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+      line-height: 1.8;
+      letter-spacing: 0.1em;
+      margin-bottom: clamp(36px, 5vw, 60px);
+    }
+
+    .spec-label {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 0;
+      font-family: var(--en);
+      font-size: 0.56rem;
+      letter-spacing: 0.22em;
+      color: var(--sumi-faint);
+    }
+    .spec-label b {
+      font-weight: 400;
+      font-family: var(--sans);
+      letter-spacing: 0.16em;
+    }
+    .spec-label i { font-style: normal; opacity: 0.5; margin: 0 9px; }
+
+    .rv {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 1.4s var(--ease-quiet), transform 1.4s var(--ease-quiet);
+    }
+    .rv.on { opacity: 1; transform: translateY(0); }
+    .rv.d1 { transition-delay: 0.12s; }
+    .rv.d2 { transition-delay: 0.24s; }
+
+    @keyframes quietFade { to { opacity: 1; } }
+
+    .txt-link {
+      display: inline-block;
+      font-family: var(--mincho);
+      font-size: 0.84rem;
+      letter-spacing: 0.2em;
+      color: var(--sumi);
+      border-bottom: 1px solid rgba(34, 31, 26, 0.35);
+      padding-bottom: 6px;
+      transition: border-color 0.5s, color 0.5s;
+    }
+    .txt-link:hover { border-color: var(--ten); color: var(--ten); }
+
+    /* ============================================================
+       1. HERO（凪）
+       ============================================================ */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+    }
+    .hero-inner {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 110px var(--pad-x) 90px;
+      will-change: transform, opacity;
+    }
+    .headline {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: clamp(2.2rem, 5.4vw, 4.3rem);
+      line-height: 1.7;
+      letter-spacing: 0.08em;
+    }
+    .hl-line {
+      display: block;
+      overflow: hidden;
+      padding-bottom: 0.14em;
+      margin-bottom: -0.14em;
+      white-space: nowrap;
+    }
+    .hl-line > span {
+      display: block;
+      transform: translateY(112%);
+      animation: rise 1.5s var(--ease-quiet) forwards;
+    }
+    .hl-line:nth-child(1) > span { animation-delay: 0.4s; }
+    .hl-line:nth-child(2) > span { animation-delay: 0.62s; }
+    .hl-line--indent { padding-left: 1.6em; }
+    @keyframes rise { to { transform: translateY(0); } }
+
+    .subcopy {
+      margin-top: 40px;
+      font-size: 0.82rem;
+      letter-spacing: 0.14em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 1.2s forwards;
+    }
+
+    /* ヒーローの標本波形（実測アイデンティティの顔） */
+    .hero-specimen {
+      margin-top: clamp(48px, 7vh, 84px);
+      opacity: 0;
+      animation: quietFade 2s var(--ease-quiet) 1.7s forwards;
+    }
+    .hero-specimen canvas {
+      width: 100%;
+      height: 88px;
+      display: block;
+    }
+    .hero-specimen .spec-label { margin-top: 12px; }
+
+    .side-label {
+      position: fixed;
+      left: clamp(20px, 3.4vw, 48px);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--mincho);
+      font-size: 0.7rem;
+      line-height: 1;
+      color: var(--sumi-faint);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 1.9s forwards;
+      transition: opacity 0.6s;
+    }
+    .side-label.hidden { opacity: 0 !important; }
+    .side-label .ch { display: block; margin-bottom: 0.6em; }
+    .side-label .ch.en { font-family: var(--en); font-size: 0.58rem; margin-bottom: 0.68em; }
+    .side-label .sep {
+      display: block;
+      width: 1px; height: 24px;
+      margin: 9px 0 15px;
+      background: currentColor;
+      opacity: 0.55;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--en);
+      font-size: 0.56rem;
+      letter-spacing: 0.34em;
+      color: var(--sumi-faint);
+      opacity: 0;
+      animation: quietFade 1.8s var(--ease-quiet) 2.1s forwards;
+    }
+    .scroll-hint i {
+      display: block;
+      width: 1px; height: 42px;
+      background: var(--sumi-faint);
+      transform-origin: top;
+      animation: hintLine 2.8s var(--ease-quiet) infinite;
+    }
+    @keyframes hintLine {
+      0%   { transform: scaleY(0); }
+      45%  { transform: scaleY(1); transform-origin: top; }
+      46%  { transform-origin: bottom; }
+      90%, 100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ============================================================
+       2. NEWS（凪・帯）
+       ============================================================ */
+    .news {
+      padding: 52px 0;
+      border-top: var(--hairline);
+      border-bottom: var(--hairline);
+    }
+    .news-grid {
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      gap: 36px;
+      align-items: start;
+    }
+    .news .en-label { margin: 6px 0 0; }
+    .news-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 24px;
+      padding: 9px 0;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      border-bottom: 1px dashed rgba(34, 31, 26, 0.1);
+    }
+    .news-row:last-child { border-bottom: none; }
+    .news-row time {
+      font-family: var(--en);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--sumi-faint);
+      padding-top: 3px;
+      font-variant-numeric: tabular-nums;
+    }
+    .news-row a { color: var(--sumi-soft); transition: color 0.4s; }
+    .news-row a:hover { color: var(--sumi); }
+    .news-all {
+      font-family: var(--en);
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      color: var(--sumi-faint);
+      padding-top: 8px;
+      border-bottom: 1px solid transparent;
+      transition: color 0.4s, border-color 0.4s;
+    }
+    .news-all:hover { color: var(--sumi); border-color: var(--sumi); }
+
+    /* ============================================================
+       3. MISSION（凪・文字が満ちる）
+       ============================================================ */
+    .mission { position: relative; height: 220vh; }
+    .mission-pin {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mission-body {
+      max-width: 800px;
+      padding: 0 var(--pad-x);
+      will-change: transform;
+      text-align: center;
+    }
+    .fill-text {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.4rem, 3.2vw, 2.3rem);
+      line-height: 2.4;
+      letter-spacing: 0.11em;
+      color: #d8d2c4;
+      text-align: left;
+    }
+    .fill-text em { font-style: normal; }
+    .fill-text .fc { transition: color 0.35s linear; }
+    .fill-text .fc.lit { color: var(--sumi); }
+    .fill-text .fc.lit.hi { color: var(--ten); }
+
+    /* ============================================================
+       4. ABOUT（凪）
+       ============================================================ */
+    .about { padding: clamp(110px, 15vw, 200px) 0; }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: clamp(48px, 7vw, 110px);
+      align-items: start;
+    }
+    .about-text p {
+      font-size: 0.87rem;
+      letter-spacing: 0.1em;
+      line-height: 2.5;
+      color: var(--sumi-soft);
+      margin-bottom: 26px;
+    }
+    .about-text strong { color: var(--sumi); font-weight: 500; }
+    .about-points { display: flex; flex-direction: column; }
+    .about-point {
+      padding: 28px 0;
+      border-bottom: var(--hairline);
+    }
+    .about-point:first-child { border-top: var(--hairline); }
+    .about-point .num {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--ten);
+      margin-bottom: 8px;
+    }
+    .about-point h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.02rem;
+      letter-spacing: 0.14em;
+      margin-bottom: 6px;
+    }
+    .about-point p {
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       5. WHY（凪・濃い紙）
+       ============================================================ */
+    .why { padding: clamp(110px, 15vw, 200px) 0; background: var(--paper-deep); }
+    .why-item {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: clamp(24px, 5vw, 72px);
+      padding: clamp(36px, 4.5vw, 56px) 0;
+      border-bottom: 1px solid rgba(34, 31, 26, 0.12);
+    }
+    .why-item:first-of-type { border-top: 1px solid rgba(34, 31, 26, 0.12); }
+    .why-item .num {
+      font-family: var(--mincho);
+      font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+      color: var(--sumi-faint);
+      line-height: 1.5;
+    }
+    .why-item h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(1.1rem, 2vw, 1.45rem);
+      letter-spacing: 0.12em;
+      margin-bottom: 16px;
+    }
+    .why-item p {
+      font-size: 0.84rem;
+      letter-spacing: 0.09em;
+      line-height: 2.4;
+      color: var(--sumi-soft);
+      max-width: 620px;
+    }
+
+    /* ============================================================
+       6. 信号シーン（暗転・ピン留め）
+       ============================================================ */
+    .signal { position: relative; height: 320vh; background: var(--ink); }
+    .signal-pin {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: hidden;
+      color: var(--paper);
+    }
+    /* graticule */
+    .signal-pin::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(55, 255, 165, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(55, 255, 165, 0.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+    .signal-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .signal-head {
+      position: absolute;
+      top: 34px;
+      left: var(--pad-x);
+      right: var(--pad-x);
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      color: rgba(247, 244, 238, 0.45);
+    }
+    .signal-head .rec { color: var(--ten); transition: color 0.5s; }
+    .signal-head .rec.calm { color: var(--phos-dim); }
+    .signal-stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 var(--pad-x);
+    }
+    .signal-word {
+      font-family: var(--en);
+      font-weight: 500;
+      font-size: clamp(3.2rem, 10vw, 7.6rem);
+      letter-spacing: 0.5em;
+      padding-left: 0.5em;
+      line-height: 1.2;
+      color: var(--paper);
+      opacity: 0;
+      will-change: opacity, letter-spacing, transform;
+    }
+    .signal-caption {
+      margin-top: 26px;
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: clamp(0.9rem, 1.7vw, 1.1rem);
+      letter-spacing: 0.24em;
+      opacity: 0;
+      will-change: opacity, transform;
+    }
+    .signal-sub {
+      margin-top: 18px;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.32em;
+      color: rgba(247, 244, 238, 0.45);
+      opacity: 0;
+      will-change: opacity;
+    }
+    .signal-spec {
+      position: absolute;
+      bottom: 32px;
+      left: var(--pad-x);
+      right: var(--pad-x);
+      display: flex;
+      justify-content: flex-end;
+    }
+    .signal-spec .spec-label { color: var(--phos-dim); }
+    .signal-spec .spec-label b { color: rgba(247, 244, 238, 0.6); }
+
+    /* ============================================================
+       7. PRODUCT 詳細（凪）
+       ============================================================ */
+    .product-detail { padding: clamp(110px, 15vw, 190px) 0; }
+    .product-detail .lead {
+      max-width: 640px;
+      font-size: 0.87rem;
+      letter-spacing: 0.1em;
+      line-height: 2.5;
+      color: var(--sumi-soft);
+      margin-bottom: 56px;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0 clamp(40px, 6vw, 88px);
+      max-width: 880px;
+    }
+    .feature {
+      display: flex;
+      align-items: baseline;
+      gap: 18px;
+      padding: 19px 0;
+      border-bottom: var(--hairline);
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+    .feature i {
+      flex-shrink: 0;
+      width: 14px; height: 1px;
+      background: var(--ten);
+      transform: translateY(-4px);
+    }
+
+    /* ============================================================
+       8. TECHNOLOGY（凪・濃い紙）
+       ============================================================ */
+    .tech { padding: clamp(110px, 15vw, 200px) 0; background: var(--paper-deep); }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(44px, 6vw, 80px) clamp(40px, 6vw, 88px);
+    }
+    .tech-item .num {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--ten);
+      margin-bottom: 14px;
+    }
+    .tech-item h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.12rem;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+    }
+    .tech-item p {
+      font-size: 0.79rem;
+      letter-spacing: 0.08em;
+      line-height: 2.3;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       9. USE CASES（凪）
+       ============================================================ */
+    .cases { padding: clamp(110px, 15vw, 200px) 0; }
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: clamp(28px, 4vw, 48px);
+    }
+    .case figure {
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .case img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: sepia(0.14) saturate(0.85) brightness(1.02);
+      transform: scale(1.06);
+      transition: transform 1.6s var(--ease-quiet);
+    }
+    .case:hover img { transform: scale(1); }
+    .case .en {
+      display: block;
+      font-family: var(--en);
+      font-size: 0.55rem;
+      letter-spacing: 0.32em;
+      color: var(--sumi-faint);
+      margin-bottom: 8px;
+    }
+    .case h3 {
+      font-family: var(--mincho);
+      font-weight: 500;
+      font-size: 1.05rem;
+      letter-spacing: 0.14em;
+      margin-bottom: 6px;
+    }
+    .case p {
+      font-size: 0.77rem;
+      letter-spacing: 0.08em;
+      color: var(--sumi-soft);
+    }
+
+    /* ============================================================
+       10. VISION（凪）
+       ============================================================ */
+    .vision { position: relative; height: 170vh; }
+    .vision-pin {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .vision-body { max-width: 720px; padding: 0 var(--pad-x); will-change: transform; }
+    .vision-title {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: clamp(1.6rem, 3.6vw, 2.6rem);
+      line-height: 2.1;
+      letter-spacing: 0.1em;
+      margin-bottom: 36px;
+      will-change: opacity, transform;
+    }
+    .vision-text {
+      font-size: 0.83rem;
+      letter-spacing: 0.1em;
+      line-height: 2.6;
+      color: var(--sumi-soft);
+      will-change: opacity, transform;
+    }
+
+    /* ============================================================
+       11. COMPANY（凪・濃い紙）
+       ============================================================ */
+    .company { padding: clamp(110px, 14vw, 180px) 0; background: var(--paper-deep); }
+    .company-table {
+      width: 100%;
+      max-width: 760px;
+      border-collapse: collapse;
+    }
+    .company-table th,
+    .company-table td {
+      text-align: left;
+      padding: 21px 8px;
+      border-bottom: 1px solid rgba(34, 31, 26, 0.12);
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      font-weight: 400;
+      vertical-align: top;
+    }
+    .company-table th {
+      width: 180px;
+      color: var(--sumi-faint);
+      font-family: var(--mincho);
+      letter-spacing: 0.2em;
+      white-space: nowrap;
+    }
+    .company-table td { color: var(--sumi-soft); }
+
+    /* ============================================================
+       12. CONTACT（凪）
+       ============================================================ */
+    .contact {
+      padding: clamp(130px, 17vw, 230px) 0;
+      text-align: center;
+    }
+    .contact h2 {
+      font-family: var(--mincho);
+      font-weight: 600;
+      font-size: clamp(1.7rem, 4vw, 2.7rem);
+      letter-spacing: 0.13em;
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+    .contact p {
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      color: var(--sumi-soft);
+      margin-bottom: 52px;
+    }
+    .contact-link {
+      display: inline-block;
+      font-family: var(--mincho);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      letter-spacing: 0.3em;
+      color: var(--sumi);
+      border-bottom: 1px solid rgba(34, 31, 26, 0.4);
+      padding-bottom: 10px;
+      transition: color 0.5s, border-color 0.5s, letter-spacing 0.5s;
+    }
+    .contact-link:hover {
+      color: var(--ten);
+      border-color: var(--ten);
+      letter-spacing: 0.38em;
+    }
+
+    /* ============================================================
+       FOOTER（凪）
+       ============================================================ */
+    .footer {
+      border-top: var(--hairline);
+      padding: 54px 0 46px;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .footer .brand { opacity: 0.85; }
+    .footer-nav {
+      display: flex;
+      gap: 28px;
+      font-family: var(--en);
+      font-size: 0.66rem;
+      letter-spacing: 0.2em;
+      color: var(--sumi-soft);
+    }
+    .footer-nav a:hover { color: var(--sumi); }
+    .footer-copy {
+      width: 100%;
+      margin-top: 34px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(34, 31, 26, 0.08);
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--en);
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      color: var(--sumi-faint);
+    }
+
+    /* ============================================================
+       レスポンシブ
+       ============================================================ */
+    @media (max-width: 860px) {
+      .nav { display: none; }
+      .side-label { display: none; }
+      .hl-line { white-space: normal; }
+      .hl-line--indent { padding-left: 0.8em; }
+      .news-grid { grid-template-columns: 1fr; gap: 14px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .why-item { grid-template-columns: 1fr; gap: 10px; }
+      .features { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: 1fr; }
+      .case-grid { grid-template-columns: 1fr; }
+      .company-table th { width: 110px; }
+      .mission { height: 200vh; }
+      .signal { height: 280vh; }
+    }
+
+    /* ============================================================
+       reduced motion
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .header, .subcopy, .side-label, .scroll-hint, .hero-specimen { animation: none; opacity: 1; }
+      .hl-line > span { animation: none; transform: none; }
+      .scroll-hint i { animation: none; transform: scaleY(1); }
+      .rv { opacity: 1; transform: none; transition: none; }
+      .fill-text { color: var(--sumi); }
+      .mission, .signal, .vision { height: auto; }
+      .mission-pin, .signal-pin, .vision-pin { position: static; height: auto; min-height: 60vh; }
+      .signal-word, .signal-caption, .signal-sub,
+      .vision-title, .vision-text { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="header" id="header">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="meldworks logo">
+        <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="14"/>
+        <circle cx="162" cy="170" r="10" fill="currentColor"/>
+        <circle cx="143" cy="285" r="24" fill="currentColor"/>
+        <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+        <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+        <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+      </svg>
+      <span>meldworks</span>
+    </a>
+    <nav class="nav">
+      <a href="#about">About</a>
+      <a href="#technology">Technology</a>
+      <a href="#product">Product</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <span class="lang"><b>JP</b> / EN</span>
+    </nav>
+  </header>
+
+  <p class="side-label" id="side-label" aria-label="ウェアラブル脳波計 HUSH"><span class="ch">ウ</span><span class="ch">ェ</span><span class="ch">ア</span><span class="ch">ラ</span><span class="ch">ブ</span><span class="ch">ル</span><span class="ch">脳</span><span class="ch">波</span><span class="ch">計</span><span class="sep" aria-hidden="true"></span><span class="ch en">H</span><span class="ch en">U</span><span class="ch en">S</span><span class="ch en">H</span></p>
+
+  <main>
+
+    <!-- 1. HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-inner" id="hero-inner">
+        <h1 class="headline">
+          <span class="hl-line"><span>感覚に頼る時代は、</span></span>
+          <span class="hl-line hl-line--indent"><span>終わる<span class="ten">。</span></span></span>
+        </h1>
+        <p class="subcopy">
+          脳波を、日常のデータに。<br>
+          イヤホンのように装着するだけの、超小型ウェアラブル脳波計。
+        </p>
+        <div class="hero-specimen">
+          <canvas id="hero-wave"></canvas>
+          <p class="spec-label"><span>SPECIMEN 001</span><i>／</i><span>α 9.8 Hz</span><i>／</i><span>TODAY 06:12</span><i>／</i><b>これは、代表・林の今朝の脳波。</b></p>
+        </div>
+      </div>
+      <div class="scroll-hint"><i></i><span>SCROLL</span></div>
+    </section>
+
+    <!-- 2. NEWS（試作では静的なダミー） -->
+    <section class="news" id="news">
+      <div class="container">
+        <div class="news-grid">
+          <span class="en-label">NEWS</span>
+          <div>
+            <div class="news-row">
+              <time>2026.04.25</time>
+              <a href="#">BS朝日「fresh faces」にメルドワークスが出演</a>
+            </div>
+            <div class="news-row">
+              <time>2026.03.26</time>
+              <a href="#">Take Off Pitch にて CIC 賞および投資検討権を獲得</a>
+            </div>
+            <div class="news-row">
+              <time>2026.02.24</time>
+              <a href="#">YOAKE PITCH にて GREEN FUNDING 賞を受賞</a>
+            </div>
+          </div>
+          <a class="news-all" href="#">ALL NEWS</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. MISSION -->
+    <section class="mission" id="mission">
+      <div class="mission-pin">
+        <div class="mission-body" id="mission-body">
+          <span class="en-label">OUR MISSION</span>
+          <p class="fill-text" id="fill-text">心拍、睡眠、活動量。からだの多くは、もう見えるようになった。けれど脳の状態だけが、まだ感覚のなかに取り残されている。私たちは脳波をあたりまえの日常データに変え、人が<em>まだ知らない自分</em>と出会える社会をつくる。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ABOUT -->
+    <section class="about" id="about">
+      <div class="container">
+        <span class="en-label rv">ABOUT</span>
+        <h2 class="sec-title rv">メルドワークスとは<span class="ten">。</span></h2>
+        <div class="about-grid">
+          <div class="about-text rv d1">
+            <p>
+              株式会社メルドワークスは、東京を拠点とするブレインテックスタートアップです。
+              これまで病院や研究機関でしか使えなかった脳波計を、
+              <strong>日常のウェアラブルデバイスとして再発明する</strong>ことに挑んでいます。
+            </p>
+            <p>
+              私たちの出発点は、「脳の状態が分かれば、人の生き方が変わる」という確信です。
+              ストレス、集中、疲労、覚醒——これらの情報が日常的に使えるようになったとき、
+              個人のパフォーマンスも、社会の在り方も、大きく変化すると考えています。
+            </p>
+            <a class="txt-link" href="#">会社情報の詳細</a>
+          </div>
+          <div class="about-points rv d2">
+            <div class="about-point">
+              <span class="num">01</span>
+              <h3>脳波に特化したチーム</h3>
+              <p>EEGの計測・解析に特化した技術と知見。</p>
+            </div>
+            <div class="about-point">
+              <span class="num">02</span>
+              <h3>日常で使える形へ</h3>
+              <p>実験室の装置を、毎日身につけられる道具に。</p>
+            </div>
+            <div class="about-point">
+              <span class="num">03</span>
+              <h3>信号から、行動へ</h3>
+              <p>データを可視化で終わらせず、日々の行動につなげる。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. WHY -->
+    <section class="why" id="why">
+      <div class="container">
+        <span class="en-label rv">WHY BRAINWAVE</span>
+        <h2 class="sec-title rv">なぜ、脳波なのか<span class="ten">。</span></h2>
+        <div>
+          <div class="why-item rv">
+            <span class="num">壱</span>
+            <div>
+              <h3>最も本質的な生体信号</h3>
+              <p>脳波は、思考・感情・集中・疲労・覚醒状態を直接反映する信号です。心拍や加速度では捉えられない内的状態を、リアルタイムで読み取ることができます。</p>
+            </div>
+          </div>
+          <div class="why-item rv">
+            <span class="num">弐</span>
+            <div>
+              <h3>まだ未開拓の領域</h3>
+              <p>ウェアラブル市場において、脳波の日常活用は世界的にもまだ発展途上です。技術的障壁が高い分、先行優位性が大きく、社会的インパクトも非常に大きい領域です。</p>
+            </div>
+          </div>
+          <div class="why-item rv">
+            <span class="num">参</span>
+            <div>
+              <h3>行動変容への可能性</h3>
+              <p>単なる可視化にとどまらず、脳の状態に基づいたフィードバックや習慣最適化へとつなげることで、人々の日常を根本から改善できる可能性を持っています。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 信号シーン（暗転） -->
+    <section class="signal" id="product">
+      <div class="signal-pin" id="signal-pin">
+        <canvas class="signal-canvas" id="signal-canvas"></canvas>
+        <div class="signal-head">
+          <span>HUSH — WEARABLE EEG</span>
+          <span class="rec" id="signal-rec">● REC</span>
+        </div>
+        <div class="signal-stage">
+          <div class="signal-word" id="signal-word">HUSH</div>
+          <p class="signal-caption" id="signal-caption">騒がしい信号が、静けさに変わる<span class="ten">。</span></p>
+          <p class="signal-sub" id="signal-sub">COMING SOON</p>
+        </div>
+        <div class="signal-spec">
+          <p class="spec-label"><span>SPECIMEN 002</span><i>／</i><span>β 18.4 Hz</span><i>／</i><span>2026.07.02 10:41</span><i>／</i><b>集中の底から、凪へ</b><i>／</i><span>Y.H. — CONSENTED</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. PRODUCT 詳細 -->
+    <section class="product-detail">
+      <div class="container">
+        <span class="en-label rv">PRODUCT</span>
+        <h2 class="sec-title rv">HUSH<span class="ten">。</span></h2>
+        <p class="lead rv">
+          HUSHは、イヤホンのように装着するだけで脳波を計測できる、超小型のウェアラブルデバイスです。
+          日常生活の中で、あなたの状態を静かに観測し続けます。
+        </p>
+        <div class="features">
+          <div class="feature rv"><i></i>超小型設計</div>
+          <div class="feature rv d1"><i></i>ワイヤレスによる快適な装着感</div>
+          <div class="feature rv"><i></i>リアルタイム脳波計測</div>
+          <div class="feature rv d1"><i></i>アプリ・解析ソフトとの連携</div>
+          <div class="feature rv"><i></i>日常装着を前提とした設計思想</div>
+          <div class="feature rv d1" style="border-bottom-color: transparent;">
+            <a class="txt-link" href="#" style="font-size: 0.8rem;">製品詳細を見る</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. TECHNOLOGY -->
+    <section class="tech" id="technology">
+      <div class="container">
+        <span class="en-label rv">TECHNOLOGY</span>
+        <h2 class="sec-title rv">技術的強み<span class="ten">。</span></h2>
+        <div class="tech-grid">
+          <div class="tech-item rv">
+            <span class="num">01</span>
+            <h3>超小型設計</h3>
+            <p>耳という限られたスペースに、高精度の脳波センサーを収める独自の実装技術。日常装着を可能にするための設計思想が起点にあります。</p>
+          </div>
+          <div class="tech-item rv d1">
+            <span class="num">02</span>
+            <h3>ノイズ処理・信号処理</h3>
+            <p>日常環境では、体動・筋電・電磁ノイズが混入します。これらを精度高く除去し、クリーンな脳波信号を抽出するアルゴリズムを独自開発しています。</p>
+          </div>
+          <div class="tech-item rv">
+            <span class="num">03</span>
+            <h3>リアルタイム解析基盤</h3>
+            <p>計測した脳波を即座に解析し、ユーザーの状態推定へと変換するリアルタイム処理パイプラインを構築。低遅延での状態フィードバックを実現します。</p>
+          </div>
+          <div class="tech-item rv d1">
+            <span class="num">04</span>
+            <h3>データ活用・行動変容</h3>
+            <p>蓄積された個人の脳波データを基に、状態パターンの学習・最適化フィードバックへと展開するデータ基盤の構想を持っています。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. USE CASES -->
+    <section class="cases" id="cases">
+      <div class="container">
+        <span class="en-label rv">USE CASES</span>
+        <h2 class="sec-title rv">活用シーン<span class="ten">。</span></h2>
+        <div class="case-grid">
+          <div class="case rv">
+            <figure><img src="../images/sports-athletes.png" alt="スポーツでの活用"></figure>
+            <span class="en">SPORT &amp; PERFORMANCE</span>
+            <h3>スポーツチーム・アスリート</h3>
+            <p>集中状態・覚醒レベルのリアルタイム把握。トレーニングの質と試合前の状態最適化に。</p>
+          </div>
+          <div class="case rv d1">
+            <figure><img src="../images/research-lab.jpg" alt="研究での活用"></figure>
+            <span class="en">RESEARCH &amp; EDUCATION</span>
+            <h3>研究機関・大学</h3>
+            <p>実験室の外での脳波データ取得を可能にし、フィールド認知科学研究の可能性を広げる。</p>
+          </div>
+          <div class="case rv">
+            <figure><img src="../images/enterprise-factory.jpg" alt="産業現場での活用"></figure>
+            <span class="en">ENTERPRISE &amp; INDUSTRY</span>
+            <h3>企業・産業現場</h3>
+            <p>覚醒度が安全に直結する現場で、ヒューマンエラー防止と安全管理の高度化に貢献。</p>
+          </div>
+          <div class="case rv d1">
+            <figure><img src="../images/personal-wellness.jpg" alt="個人での活用"></figure>
+            <span class="en">PERSONAL &amp; WELLNESS</span>
+            <h3>個人・セルフケア</h3>
+            <p>集中・リラックス・睡眠を自分のデータとして理解し、より良い習慣づくりを支える。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. VISION -->
+    <section class="vision" id="vision">
+      <div class="vision-pin">
+        <div class="vision-body" id="vision-body">
+          <span class="en-label">VISION</span>
+          <h2 class="vision-title" id="vision-title">
+            自分の状態を知ることが、<br>
+            あたりまえになる社会へ<span class="ten">。</span>
+          </h2>
+          <p class="vision-text" id="vision-text">
+            脳波はかつて、特別な場所・特別な人のためのものでした。<br>
+            私たちは、それを変えようとしています。<br><br>
+            自分の集中を知り、疲労を知り、回復を知る。<br>
+            メルドワークスは、脳波という静かな信号から、<br>
+            人の可能性を広げることに挑み続けます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. COMPANY -->
+    <section class="company" id="company">
+      <div class="container">
+        <span class="en-label rv">COMPANY</span>
+        <h2 class="sec-title rv">会社概要<span class="ten">。</span></h2>
+        <table class="company-table rv d1">
+          <tbody>
+            <tr><th>会社名</th><td>株式会社メルドワークス（meldworks Co., Ltd）</td></tr>
+            <tr><th>所在地</th><td>東京都渋谷区円山町5番5号 Navi渋谷Ⅴ 3階</td></tr>
+            <tr><th>代表取締役</th><td>林 裕也</td></tr>
+            <tr><th>事業内容</th><td>ウェアラブル脳波計の開発および、それを用いたソフトウェア・データ活用サービスの提供</td></tr>
+            <tr><th>主力製品</th><td>HUSH（ウェアラブル脳波計）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 12. CONTACT -->
+    <section class="contact" id="contact">
+      <div class="container">
+        <span class="en-label rv">CONTACT</span>
+        <h2 class="rv">お気軽にご連絡ください<span class="ten">。</span></h2>
+        <p class="rv d1">製品・技術・採用・事業連携など、どのようなご相談もお待ちしています。</p>
+        <a class="contact-link rv d2" href="#">お問い合わせはこちら</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <a class="brand" href="#">
+          <svg viewBox="0 0 460 490" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="188" cy="252" r="183" stroke="currentColor" stroke-width="14"/>
+            <circle cx="162" cy="170" r="10" fill="currentColor"/>
+            <circle cx="143" cy="285" r="24" fill="currentColor"/>
+            <line x1="212" y1="183" x2="288" y2="140" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="208" y1="264" x2="457" y2="132" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+            <line x1="286" y1="320" x2="457" y2="228" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+          </svg>
+          <span>meldworks</span>
+        </a>
+        <nav class="footer-nav">
+          <a href="#about">About</a>
+          <a href="#technology">Technology</a>
+          <a href="#product">Product</a>
+          <a href="#news">News</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <div class="footer-copy">
+          <span>© 2026 meldworks. All rights reserved.</span>
+          <span>まだ知らない自分を知る。</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ============================================================
+       共通ユーティリティ
+       ============================================================ */
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clamp01 = v => Math.max(0, Math.min(1, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    function mulberry32(seed) {
+      return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    /* 擬似脳波（BRAND CODE準拠：α紡錘・β・θ・生体ノイズの合成） */
+    function makeEEG(seed, p) {
+      const rnd = mulberry32(seed);
+      const ph = Array.from({ length: 12 }, () => rnd() * Math.PI * 2);
+      const nf = Array.from({ length: 5 }, () => 0.7 + rnd() * 6);
+      return function (t) {
+        let v = 0;
+        const spindle = 0.45 + 0.55 * Math.max(0, Math.sin(2 * Math.PI * 0.22 * t + ph[0]));
+        v += Math.sin(2 * Math.PI * 9.8 * t + ph[1]) * (p.alpha || 0) * spindle;
+        v += Math.sin(2 * Math.PI * 18.4 * t + ph[2]) * (p.beta || 0)
+           + Math.sin(2 * Math.PI * 23.1 * t + ph[3]) * (p.beta || 0) * 0.5;
+        v += Math.sin(2 * Math.PI * 5.2 * t + ph[4]) * (p.theta || 0)
+           + Math.sin(2 * Math.PI * 3.4 * t + ph[5]) * (p.theta || 0) * 0.6;
+        let n = 0;
+        for (let i = 0; i < 5; i++) n += Math.sin(2 * Math.PI * nf[i] * t * 3.7 + ph[6 + i]);
+        v += n * (p.noise || 0) * 0.2;
+        return v;
+      };
+    }
+
+    function setupCanvas(canvas) {
+      const ctx = canvas.getContext('2d');
+      const state = { W: 0, H: 0 };
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        state.W = canvas.offsetWidth;
+        state.H = canvas.offsetHeight;
+        canvas.width = state.W * dpr;
+        canvas.height = state.H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener('resize', resize);
+      resize();
+      return { ctx, state, resize };
+    }
+
+    /* ============================================================
+       スクロール速度（ヒーロー標本波の呼吸に使う）
+       ============================================================ */
+    let scrollVel = 0;
+    (function () {
+      let lastY = window.scrollY;
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        scrollVel = Math.min(50, scrollVel + Math.abs(y - lastY) * 0.18);
+        lastY = y;
+      }, { passive: true });
+    })();
+
+    /* ============================================================
+       1. ヒーローの標本波形（凪：淡灰〜墨、右端に点）
+       静かに流れ、スクロールでわずかに息づく
+       ============================================================ */
+    (function () {
+      const canvas = document.getElementById('hero-wave');
+      if (!canvas) return;
+      const { ctx, state } = setupCanvas(canvas);
+      const eeg = makeEEG(11, { alpha: 1.0, beta: 0.12, noise: 0.3 });
+      let amp = 1;
+
+      function frame(now) {
+        const t = now * 0.001;
+        const { W, H } = state;
+        scrollVel *= 0.93;
+        const target = 1 + (REDUCED ? 0 : scrollVel * 0.05);
+        amp += (target - amp) * 0.06;
+
+        ctx.clearRect(0, 0, W, H);
+        const mid = H / 2;
+        const scale = (H / 2 - 6) / 1.9 * amp;
+        ctx.beginPath();
+        const speed = REDUCED ? 0 : t * 0.55;
+        for (let x = 0; x <= W - 14; x += 3) {
+          const y = mid - eeg((x / W) * 6 + speed) * scale;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = '#5d574a';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        /* 点：波の終端 */
+        const dy = mid - eeg(((W - 14) / W) * 6 + speed) * scale;
+        ctx.beginPath();
+        ctx.arc(W - 7, dy, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#e2561f';
+        ctx.fill();
+
+        if (!REDUCED) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    /* ============================================================
+       2. MISSION：文字が満ちる
+       ============================================================ */
+    (function () {
+      const box = document.getElementById('fill-text');
+      if (!box || REDUCED) return;
+      const chars = [];
+      function split(node, hi) {
+        Array.from(node.childNodes).forEach(child => {
+          if (child.nodeType === Node.TEXT_NODE) {
+            const frag = document.createDocumentFragment();
+            for (const ch of child.textContent) {
+              const s = document.createElement('span');
+              s.className = 'fc';
+              s.textContent = ch;
+              frag.appendChild(s);
+              chars.push({ el: s, hi });
+            }
+            child.replaceWith(frag);
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            split(child, hi || child.tagName === 'EM');
+          }
+        });
+      }
+      split(box, false);
+
+      let lit = -1;
+      window.__mission = function (p) {
+        const k = clamp01((p - 0.02) / 0.82);
+        const n = Math.round(k * chars.length);
+        if (n === lit) return;
+        lit = n;
+        chars.forEach((c, i) => {
+          c.el.classList.toggle('lit', i < n);
+          if (c.hi) c.el.classList.toggle('hi', i < n);
+        });
+      };
+    })();
+
+    /* ============================================================
+       3. 信号シーン：燐光の波が凪ぎ、HUSHが浮かぶ
+       ============================================================ */
+    const signalState = { p: 0, active: false };
+    (function () {
+      const canvas = document.getElementById('signal-canvas');
+      if (!canvas) return;
+      const { ctx, state } = setupCanvas(canvas);
+      const eeg = makeEEG(47, { alpha: 0.35, beta: 0.9, noise: 0.5 });
+
+      function frame(now) {
+        const { W, H } = state;
+        ctx.clearRect(0, 0, W, H);
+        if (signalState.active || REDUCED) {
+          const t = REDUCED ? 1 : now * 0.001;
+          const p = REDUCED ? 0.2 : signalState.p;
+          // 0→0.55 で凪いでいく。HUSH出現後はほぼ平らな一本の線
+          const calm = clamp01(p / 0.55);
+          const amp = (H * 0.18) * Math.pow(1 - calm, 1.5) + 1.2;
+          const mid = H * 0.5;
+
+          ctx.beginPath();
+          for (let x = 0; x <= W; x += 4) {
+            const y = mid - eeg((x / W) * 7 + t * 1.1) * amp;
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = '#37ffa5';
+          ctx.lineWidth = 1.4;
+          ctx.shadowColor = 'rgba(55, 255, 165, 0.6)';
+          ctx.shadowBlur = 8;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    /* ============================================================
+       4. メインループ：シーン進行
+       ============================================================ */
+    (function () {
+      function pinProgress(el) {
+        const rect = el.getBoundingClientRect();
+        const total = el.offsetHeight - window.innerHeight;
+        if (total <= 0) return 1;
+        return clamp01(-rect.top / total);
+      }
+
+      const header    = document.getElementById('header');
+      const sideLabel = document.getElementById('side-label');
+      const heroInner = document.getElementById('hero-inner');
+      const mission   = document.getElementById('mission');
+      const missionBody = document.getElementById('mission-body');
+      const signal    = document.getElementById('product');
+      const sWord     = document.getElementById('signal-word');
+      const sCaption  = document.getElementById('signal-caption');
+      const sSub      = document.getElementById('signal-sub');
+      const sRec      = document.getElementById('signal-rec');
+      const vision    = document.getElementById('vision');
+      const vBody     = document.getElementById('vision-body');
+      const vTitle    = document.getElementById('vision-title');
+      const vText     = document.getElementById('vision-text');
+
+      if (REDUCED) {
+        signalState.active = true;
+        return;
+      }
+
+      function frame() {
+        const vh = window.innerHeight;
+        const y  = window.scrollY;
+
+        header.classList.toggle('solid', y > vh * 0.6);
+
+        /* ヒーロー退場 */
+        const hp = clamp01(y / (vh * 0.9));
+        heroInner.style.transform = `translateY(${-hp * 9}vh)`;
+        heroInner.style.opacity = String(1 - hp * 1.15);
+
+        /* ミッション */
+        const mp = pinProgress(mission);
+        if (window.__mission) window.__mission(mp);
+        missionBody.style.transform = `translateY(${lerp(7, -7, mp)}vh)`;
+
+        /* 信号シーン */
+        const sp = pinProgress(signal);
+        const inSignal = sp > 0 && sp < 1;
+        signalState.p = sp;
+        signalState.active = inSignal;
+
+        /* 暗転中はヘッダーと縦ラベルを消し、闇に集中させる */
+        header.classList.toggle('hidden', inSignal && sp > 0.02 && sp < 0.98);
+        sideLabel.classList.toggle('hidden', inSignal && sp > 0.02 && sp < 0.98);
+
+        /* REC → CALM */
+        if (sRec) {
+          const calm = sp > 0.55;
+          sRec.textContent = calm ? '○ CALM' : '● REC';
+          sRec.classList.toggle('calm', calm);
+        }
+
+        const wordK = clamp01((sp - 0.3) / 0.35);
+        const we = 1 - Math.pow(1 - wordK, 3);
+        sWord.style.opacity = String(we);
+        sWord.style.letterSpacing = `${lerp(0.5, 0.24, we)}em`;
+        sWord.style.paddingLeft = `${lerp(0.5, 0.24, we)}em`;
+        sWord.style.transform = `translateY(${lerp(22, 0, we)}px)`;
+
+        const capK = clamp01((sp - 0.58) / 0.22);
+        sCaption.style.opacity = String(capK);
+        sCaption.style.transform = `translateY(${lerp(16, 0, capK)}px)`;
+
+        const subK = clamp01((sp - 0.72) / 0.18);
+        sSub.style.opacity = String(subK);
+
+        /* ビジョン */
+        const vp = pinProgress(vision);
+        vBody.style.transform = `translateY(${lerp(4, -4, vp)}vh)`;
+        const vtK = clamp01((vp - 0.05) / 0.3);
+        vTitle.style.opacity = String(vtK);
+        vTitle.style.transform = `translateY(${lerp(28, 0, 1 - Math.pow(1 - vtK, 3))}px)`;
+        const vxK = clamp01((vp - 0.25) / 0.3);
+        vText.style.opacity = String(vxK);
+        vText.style.transform = `translateY(${lerp(22, 0, 1 - Math.pow(1 - vxK, 3))}px)`;
+
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+
+    /* ============================================================
+       5. 静かなリビール
+       ============================================================ */
+    (function () {
+      const els = document.querySelectorAll('.rv');
+      if (REDUCED) { els.forEach(el => el.classList.add('on')); return; }
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('on');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+      els.forEach(el => io.observe(el));
+    })();
+  </script>
+</body>
+</html>
